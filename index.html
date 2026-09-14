@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Trade Management — demystified</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:#F5F0E8; font-family:system-ui,-apple-system,sans-serif; color:#1a1108; min-height:100vh; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+@keyframes slideIn { from{opacity:0;transform:translateX(-8px)} to{opacity:1;transform:translateX(0)} }
+.fu { animation:fadeUp 0.3s ease forwards; }
+.si { animation:slideIn 0.25s ease forwards; }
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-thumb{background:#C4A460;border-radius:3px}
+@media (max-width:620px){ .g2 { grid-template-columns:1fr !important; } .g3 { grid-template-columns:1fr !important; } .g5 { grid-template-columns:1fr 1fr !important; } }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState } = React;
+const OR="#F5853F",RD="#D94F2A",GR="#0D9E6E",GD="#C4A460",PU="#7C5CBF",BL="#2A7ED4",DK="#1a1108",CA="#fffcf7",BD="#e8ddd0";
+
+// ── Resource links ────────────────────────────────────────────
+const LINK = {
+  planning: "https://tradeplanning.vercel.app/",
+  ta:       "https://technical-analysis-mu.vercel.app/",
+  chain:    "https://options-chain-decoder.vercel.app/",
+  checklist:"https://pre-trade-checklist.vercel.app/",
+  planner:  "https://kajabi-communities-documents.s3.us-west-2.amazonaws.com/b0f3bd36-41da-46bb-bd7b-634990968879",
+  journal:  null,   // Trade Journal — link pending
+  risk:     null,   // Risk Management module — coming soon
+};
+
+// ── Companion resources (plan → live chart → journal) ─────────
+const TOOLS = [
+  {icon:"📝",label:"Trade Planner",url:LINK.planner,note:"The plan you wrote before entry. Every decision in this module points back to it."},
+  {icon:"📊",label:"Technical Analysis",url:LINK.ta,note:"Module: the live chart. Trend, levels, and structure you are observing against the plan."},
+  {icon:"📓",label:"Trade Journal",url:LINK.journal,note:"Where the result gets recorded. Coming soon.",soon:true},
+  {icon:"🧭",label:"Trade Planning",url:LINK.planning,note:"Module 5: how the plan was built. Revisit it if your plan is missing a condition."},
+  {icon:"⛓️",label:"The Options Chain",url:LINK.chain,note:"Module: contract mechanics. Reference it, do not relearn it here."},
+  {icon:"🛡️",label:"Risk Management",url:LINK.risk,note:"Module: position sizing and max loss. Coming soon.",soon:true},
+];
+
+// ── Management paths (the field guide) ────────────────────────
+const PATHS = [
+  {tab:1,icon:"📈",label:"Manage a Winner",color:GR,cond:"Price moved in your favor",q:"Has a profit‑management condition from my plan occurred?"},
+  {tab:2,icon:"📉",label:"Manage a Loser",color:RD,cond:"Price moved against you",q:"Has my predefined invalidation condition occurred?"},
+  {tab:3,icon:"⏸️",label:"Stay With the Trade",color:BL,cond:"Neither condition has occurred",q:"Is there anything in my plan that tells me to act right now?"},
+];
+
+// ═══════════════════════════════════════════════════════════════
+// SHARED COMPONENTS (module level — never inside App)
+// ═══════════════════════════════════════════════════════════════
+function NextBtn({label,onClick}){return(<button onClick={onClick} style={{background:OR,border:"none",borderRadius:"999px",padding:"10px 26px",color:"#fff",fontWeight:"700",fontSize:"0.82rem",letterSpacing:"0.06em",cursor:"pointer",display:"flex",alignItems:"center",gap:"6px",margin:"20px auto 0"}}>{label} →</button>);}
+
+function RuleBox({rule,color}){return(<div style={{background:"linear-gradient(130deg,#1a1108,#2c1d0e)",borderRadius:"8px",padding:"11px 13px",marginBottom:"10px",borderLeft:"3px solid "+(color||OR)}}><div style={{fontSize:"0.62rem",fontWeight:"700",letterSpacing:"0.12em",textTransform:"uppercase",color:"#9a7a55",marginBottom:"6px"}}>⚡ The Rule</div><div style={{fontSize:"0.78rem",lineHeight:"1.65",color:"#e8ddd0"}}>{rule}</div></div>);}
+
+function SectionLabel({label,sub,color}){return(<div style={{display:"flex",alignItems:"center",gap:"10px",marginBottom:"12px",paddingBottom:"8px",borderBottom:"2px solid #e8ddd033"}}><div style={{width:"3px",height:"22px",background:color||OR,borderRadius:"2px"}}/><div><div style={{fontWeight:"700",fontSize:"0.88rem",color:DK}}>{label}</div>{sub&&<div style={{fontSize:"0.72rem",color:"#8a7560"}}>{sub}</div>}</div></div>);}
+
+function InfoBox({icon,label,bg,dark,green,italic,mt,children}){
+  return(
+    <div style={{background:bg||"#f7f0e6",borderRadius:"8px",padding:"11px 13px",marginTop:mt?"10px":"0"}}>
+      <div style={{fontSize:"0.62rem",fontWeight:"700",letterSpacing:"0.12em",textTransform:"uppercase",color:dark?"#9a7a55":green?"#065f46":"#8a7560",marginBottom:"6px"}}>{icon} {label}</div>
+      <div style={{fontSize:"0.8rem",lineHeight:"1.65",color:dark?"#e8ddd0":green?"#052e16":"#3d2e1e",fontStyle:italic?"italic":"normal"}}>{children}</div>
+    </div>
+  );
+}
+
+function GreenRed({green,red,greenLabel,redLabel}){return(<div className="g2" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"8px",marginTop:"10px"}}><div style={{background:"#e8faf3",borderRadius:"8px",padding:"10px 12px"}}><div style={{fontSize:"0.6rem",fontWeight:"700",letterSpacing:"0.1em",textTransform:"uppercase",color:GR,marginBottom:"6px"}}>✅ {greenLabel||"Green flags"}</div>{green.map((g,i)=>(<div key={i} style={{display:"flex",gap:"6px",marginBottom:"4px"}}><div style={{width:"5px",height:"5px",borderRadius:"50%",background:GR,marginTop:"5px",flexShrink:0}}/><div style={{fontSize:"0.72rem",color:"#052e16",lineHeight:"1.5"}}>{g}</div></div>))}</div><div style={{background:"#fff0ee",borderRadius:"8px",padding:"10px 12px"}}><div style={{fontSize:"0.6rem",fontWeight:"700",letterSpacing:"0.1em",textTransform:"uppercase",color:RD,marginBottom:"6px"}}>🚩 {redLabel||"Red flags"}</div>{red.map((r,i)=>(<div key={i} style={{display:"flex",gap:"6px",marginBottom:"4px"}}><div style={{width:"5px",height:"5px",borderRadius:"50%",background:RD,marginTop:"5px",flexShrink:0}}/><div style={{fontSize:"0.72rem",color:"#5a1a1a",lineHeight:"1.5"}}>{r}</div></div>))}</div></div>);}
+
+function InfoCard({icon,title,color,children}){return(<div style={{background:CA,border:"1px solid "+BD,borderRadius:"12px",padding:"14px 16px",borderLeft:"4px solid "+color}}><div style={{display:"flex",alignItems:"center",gap:"8px",marginBottom:"8px"}}><span style={{fontSize:"1.1rem"}}>{icon}</span><span style={{fontWeight:"700",fontSize:"0.82rem",color:DK}}>{title}</span></div><div style={{fontSize:"0.78rem",color:"#5a4535",lineHeight:"1.6"}}>{children}</div></div>);}
+
+// ── QDA — dark tab opener ─────────────────────────────────────
+function QDA({question,options,action,color}){
+  const c = color||OR;
+  return(
+    <div style={{background:"linear-gradient(130deg,#1a1108,#2c1d0e)",borderRadius:"12px",padding:"18px 20px",marginBottom:"16px"}}>
+      <div style={{fontSize:"0.62rem",fontWeight:"700",letterSpacing:"0.15em",textTransform:"uppercase",color:"#9a7a55",marginBottom:"7px"}}>❓ The Question</div>
+      <div style={{fontFamily:"Georgia,serif",fontSize:"1.15rem",color:"#fff",lineHeight:"1.4",marginBottom:"13px"}}>{question}</div>
+      <div style={{display:"flex",alignItems:"center",gap:"10px",marginBottom:"13px",flexWrap:"wrap"}}>
+        <span style={{fontSize:"0.62rem",fontWeight:"700",letterSpacing:"0.15em",textTransform:"uppercase",color:"#9a7a55",flexShrink:0}}>⚖️ Decision</span>
+        <div style={{display:"flex",gap:"7px",alignItems:"center",flexWrap:"wrap"}}>
+          {options.map((o,i)=>(
+            <span key={o} style={{display:"inline-block",padding:"4px 13px",borderRadius:"999px",background:i===0?c:"rgba(255,255,255,0.08)",border:"1px solid "+(i===0?c:"rgba(255,255,255,0.16)"),color:i===0?"#fff":"#d4a87a",fontSize:"0.72rem",fontWeight:"700",letterSpacing:"0.04em"}}>{o}</span>
+          ))}
+        </div>
+      </div>
+      <div style={{borderTop:"1px solid rgba(255,255,255,0.09)",paddingTop:"12px"}}>
+        <div style={{fontSize:"0.62rem",fontWeight:"700",letterSpacing:"0.15em",textTransform:"uppercase",color:"#9a7a55",marginBottom:"6px"}}>✅ The Action</div>
+        <div style={{fontSize:"0.83rem",color:"#e8ddd0",lineHeight:"1.65"}}>{action}</div>
+      </div>
+    </div>
+  );
+}
+
+// ── Ask yourself, with both outcomes ──────────────────────────
+function AskYourself({question,no,yes,color,noLabel,yesLabel}){
+  const c = color||OR;
+  return(
+    <div style={{background:CA,border:"1px solid "+BD,borderLeft:"4px solid "+c,borderRadius:"12px",padding:"16px 18px",margin:"18px 0 0"}}>
+      <div style={{display:"flex",gap:"13px",alignItems:"flex-start",marginBottom:"12px"}}>
+        <div style={{fontSize:"1.3rem",flexShrink:0,lineHeight:"1.3"}}>🤔</div>
+        <div>
+          <div style={{fontSize:"0.62rem",fontWeight:"700",letterSpacing:"0.14em",textTransform:"uppercase",color:"#8a7560",marginBottom:"6px"}}>Ask Yourself</div>
+          <div style={{fontFamily:"Georgia,serif",fontStyle:"italic",fontSize:"1rem",color:DK,lineHeight:"1.55"}}>"{question}"</div>
+        </div>
+      </div>
+      <div style={{display:"grid",gap:"7px"}}>
+        <div style={{display:"flex",gap:"9px",alignItems:"flex-start",background:"#fff0ee",borderRadius:"8px",padding:"9px 12px"}}>
+          <span style={{fontSize:"0.72rem",fontWeight:"700",color:RD,flexShrink:0,minWidth:"26px"}}>{noLabel||"No"}</span>
+          <span style={{fontSize:"0.78rem",color:"#5a1a1a",lineHeight:"1.55"}}>{no}</span>
+        </div>
+        <div style={{display:"flex",gap:"9px",alignItems:"flex-start",background:"#e8faf3",borderRadius:"8px",padding:"9px 12px"}}>
+          <span style={{fontSize:"0.72rem",fontWeight:"700",color:GR,flexShrink:0,minWidth:"26px"}}>{yesLabel||"Yes"}</span>
+          <span style={{fontSize:"0.78rem",color:"#052e16",lineHeight:"1.55"}}>{yes}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Expandable card ───────────────────────────────────────────
+function ExpandableCard({accent,icon,title,shortDesc,isOpen,onToggle,children}){
+  return(
+    <div style={{border:"1px solid "+(isOpen?accent:BD),borderRadius:"12px",overflow:"hidden",marginBottom:"8px",background:CA}}>
+      <div onClick={onToggle} style={{display:"flex",alignItems:"center",gap:"12px",padding:"14px 16px",cursor:"pointer",borderLeft:"4px solid "+accent,background:CA,transition:"background 0.15s"}}>
+        <span style={{fontSize:"1.2rem",flexShrink:0}}>{icon}</span>
+        <div style={{flex:1}}>
+          <div style={{fontWeight:"700",fontSize:"0.9rem",color:DK,marginBottom:"2px"}}>{title}</div>
+          <div style={{fontSize:"0.75rem",color:"#8a7560",lineHeight:"1.4"}}>{shortDesc}</div>
+        </div>
+        <span style={{color:"#8a7560",fontSize:"13px",flexShrink:0,transition:"transform 0.2s",transform:isOpen?"rotate(180deg)":"rotate(0deg)"}}>▼</span>
+      </div>
+      {isOpen&&(
+        <div className="fu" style={{borderTop:"1px solid "+BD,borderLeft:"4px solid "+accent,background:CA}}>
+          {children}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Two-column body for an expandable card ────────────────────
+// what / why / analogy on the left; rule / example on the right
+function Concept({what,why,analogy,rule,example,color,extra}){
+  return(
+    <div>
+      <div className="g2" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0"}}>
+        <div style={{padding:"14px 16px",borderRight:"1px solid "+BD}}>
+          <InfoBox icon="📌" label="What it is" bg="#f7f0e6">{what}</InfoBox>
+          <InfoBox icon="🎯" label="Why it matters" bg="#fff4eb" mt>{why}</InfoBox>
+          {analogy&&<InfoBox icon="💡" label="Think of it like" bg="#f7f0e6" italic mt>{analogy}</InfoBox>}
+        </div>
+        <div style={{padding:"14px 16px"}}>
+          <RuleBox rule={rule} color={color}/>
+          <InfoBox icon="🧮" label="Example" bg="#e8faf3" green>{example}</InfoBox>
+        </div>
+      </div>
+      {extra&&<div style={{padding:"0 16px 14px"}}>{extra}</div>}
+    </div>
+  );
+}
+
+// ── Resource pills ────────────────────────────────────────────
+function Resources({items,title}){
+  return(
+    <div style={{background:CA,border:"1px solid "+BD,borderRadius:"12px",padding:"14px 16px",marginTop:"16px"}}>
+      <div style={{fontSize:"0.62rem",fontWeight:"700",letterSpacing:"0.14em",textTransform:"uppercase",color:"#8a7560",marginBottom:"10px"}}>🔗 {title||"Companion resources"}</div>
+      <div style={{display:"grid",gap:"9px"}}>
+        {items.map(it=>(
+          <div key={it.label} style={{display:"flex",alignItems:"center",gap:"12px",flexWrap:"wrap"}}>
+            {it.url?(
+              <a href={it.url} target="_blank" rel="noopener noreferrer"
+                style={{display:"inline-flex",alignItems:"center",gap:"7px",background:"#f7f0e6",border:"1px solid "+BD,borderRadius:"999px",padding:"7px 15px",textDecoration:"none",color:DK,fontSize:"0.76rem",fontWeight:"700",transition:"all 0.15s",flexShrink:0,whiteSpace:"nowrap"}}
+                onMouseOver={e=>{e.currentTarget.style.borderColor=OR;e.currentTarget.style.color=OR;}}
+                onMouseOut={e=>{e.currentTarget.style.borderColor=BD;e.currentTarget.style.color=DK;}}>
+                <span>{it.icon}</span>{it.label}<span style={{color:"#b0a090",fontSize:"0.7rem"}}>↗</span>
+              </a>
+            ):(
+              <span style={{display:"inline-flex",alignItems:"center",gap:"7px",background:"#f0e8da",border:"1px dashed "+BD,borderRadius:"999px",padding:"7px 15px",color:"#8a7560",fontSize:"0.76rem",fontWeight:"700",flexShrink:0,whiteSpace:"nowrap"}}>
+                <span>{it.icon}</span>{it.label}<span style={{fontSize:"0.6rem",letterSpacing:"0.08em",textTransform:"uppercase",color:"#b0a090"}}>soon</span>
+              </span>
+            )}
+            <span style={{fontSize:"0.75rem",color:"#8a7560",lineHeight:"1.5",flex:1,minWidth:"160px"}}>{it.note}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Path switcher — jump between management paths ─────────────
+function PathSwitch({current,goTab}){
+  const others = PATHS.filter(p=>p.tab!==current);
+  return(
+    <div style={{marginTop:"18px",background:"#f0e8da",border:"1px solid "+BD,borderRadius:"12px",padding:"12px 14px"}}>
+      <div style={{fontSize:"0.62rem",fontWeight:"700",letterSpacing:"0.14em",textTransform:"uppercase",color:"#8a7560",marginBottom:"8px"}}>🧭 Condition changed? Switch paths</div>
+      <div style={{display:"flex",gap:"8px",flexWrap:"wrap"}}>
+        {others.map(p=>(
+          <button key={p.tab} onClick={()=>goTab(p.tab)}
+            style={{display:"inline-flex",alignItems:"center",gap:"7px",background:CA,border:"1px solid "+BD,borderLeft:"3px solid "+p.color,borderRadius:"999px",padding:"7px 14px",cursor:"pointer",color:DK,fontSize:"0.74rem",fontWeight:"700"}}>
+            <span>{p.icon}</span>{p.label}
+          </button>
+        ))}
+        <button onClick={()=>goTab(4)}
+          style={{display:"inline-flex",alignItems:"center",gap:"7px",background:CA,border:"1px solid "+BD,borderLeft:"3px solid "+OR,borderRadius:"999px",padding:"7px 14px",cursor:"pointer",color:DK,fontSize:"0.74rem",fontWeight:"700"}}>
+          <span>✅</span>Execute &amp; Evaluate
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ── Numbered step card (Execute tab) ──────────────────────────
+function StepCard({step,title,color,children}){
+  const c=color||OR;
+  return(
+    <div style={{background:CA,border:"1px solid "+BD,borderLeft:"4px solid "+c,borderRadius:"12px",padding:"16px 18px",marginBottom:"14px"}}>
+      <div style={{display:"flex",alignItems:"center",gap:"9px",marginBottom:"9px",flexWrap:"wrap"}}>
+        <span style={{display:"inline-block",padding:"3px 10px",borderRadius:"999px",background:c+"18",color:c,fontSize:"0.62rem",fontWeight:"700",letterSpacing:"0.1em",textTransform:"uppercase"}}>{step}</span>
+        <span style={{fontFamily:"Georgia,serif",fontSize:"1.05rem",fontWeight:"700",color:DK}}>{title}</span>
+      </div>
+      <div style={{fontSize:"0.83rem",color:"#3d2e1e",lineHeight:"1.7"}}>{children}</div>
+    </div>
+  );
+}
+
+function LinkBtn({label,url,color}){
+  if(!url) return(<span style={{display:"inline-flex",alignItems:"center",gap:"7px",background:"#f0e8da",border:"1px dashed "+BD,borderRadius:"999px",padding:"9px 20px",color:"#8a7560",fontSize:"0.78rem",fontWeight:"700",marginTop:"4px"}}>{label} <span style={{fontSize:"0.6rem",letterSpacing:"0.08em",textTransform:"uppercase"}}>soon</span></span>);
+  return(
+    <a href={url} target="_blank" rel="noopener noreferrer"
+      style={{display:"inline-flex",alignItems:"center",gap:"7px",background:color||PU,borderRadius:"999px",padding:"9px 20px",textDecoration:"none",color:"#fff",fontSize:"0.78rem",fontWeight:"700",letterSpacing:"0.04em",marginTop:"4px"}}>
+      {label} <span style={{fontSize:"0.72rem"}}>↗</span>
+    </a>
+  );
+}
+
+// ── Closing bridge: the loop starts again at the plan ─────────
+function ChecklistBridge(){
+  return(
+    <div style={{marginTop:"20px",background:"linear-gradient(130deg,#1a1108,#2c1d0e)",borderRadius:"14px",padding:"20px 22px",display:"flex",alignItems:"center",gap:"16px",flexWrap:"wrap"}}>
+      <div style={{fontSize:"1.8rem",flexShrink:0}}>📋</div>
+      <div style={{flex:1,minWidth:"200px"}}>
+        <div style={{fontSize:"0.65rem",fontWeight:"700",letterSpacing:"0.15em",textTransform:"uppercase",color:"#9a7a55",marginBottom:"5px"}}>The loop closes where it began</div>
+        <div style={{fontFamily:"Georgia,serif",fontSize:"1rem",color:"#fff",marginBottom:"5px"}}>Your next trade starts with the Pre-Trade Checklist and a written plan.</div>
+        <div style={{fontSize:"0.78rem",color:"#d4a87a",lineHeight:"1.55"}}>Carry the one variable you changed into the next plan. Then manage that trade exactly the way this module describes.</div>
+      </div>
+      <div style={{display:"flex",gap:"8px",flexWrap:"wrap",flexShrink:0}}>
+        <a href={LINK.checklist} target="_blank" rel="noopener noreferrer"
+          style={{background:OR,borderRadius:"999px",padding:"10px 22px",fontWeight:"700",fontSize:"0.8rem",color:"#fff",letterSpacing:"0.06em",whiteSpace:"nowrap",textDecoration:"none",display:"inline-block"}}>
+          Open Checklist →
+        </a>
+        <a href={LINK.planning} target="_blank" rel="noopener noreferrer"
+          style={{background:"rgba(255,255,255,0.08)",border:"1px solid rgba(255,255,255,0.14)",borderRadius:"999px",padding:"10px 22px",fontWeight:"700",fontSize:"0.8rem",color:"#d4a87a",letterSpacing:"0.06em",whiteSpace:"nowrap",textDecoration:"none",display:"inline-block"}}>
+          Trade Planning →
+        </a>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TAB 1 — MANAGE THE POSITION (the process)
+// ═══════════════════════════════════════════════════════════════
+const PROCESS_CARDS = [
+  {
+    id:"plan", icon:"🗺️", color:OR, title:"Plan vs. live price",
+    short:"The only comparison that matters once you are in the trade.",
+    what:"Trade management is the act of holding your Module 5 plan next to the live chart and asking one question: which of my predefined conditions is happening right now?",
+    why:"Without the plan, every candle becomes a new decision. With it, price movement is just information that maps to a response you already chose.",
+    analogy:"A pilot flying a route does not decide where to go each time the wind shifts. The flight plan is filed before takeoff. In the air, the job is to compare position to plan and make the corrections the plan already allows for.",
+    rule:"Open your Trade Planner every time you open the chart. Never evaluate the position without the plan in front of you.",
+    example:"Stock at $50. You bought a call for $1.30 with a target at $54, invalidation below $48.50. Stock is now $51.20. Compare: target not hit, invalidation not hit. The plan says nothing has happened yet, so nothing needs to be done."
+  },
+  {
+    id:"conditions", icon:"🚦", color:GR, title:"Hold / exit conditions",
+    short:"Every plan has three states. Only two of them require action.",
+    what:"Before entry, the plan defined a profit‑management condition and an invalidation condition. Everything else is a hold. That gives price exactly three places to be: winner condition met, loser condition met, or neither.",
+    why:"Three states is a manageable number of decisions. Three hundred candles is not. Sorting price into one of the three states is what stops a live trade from feeling like chaos.",
+    analogy:"A thermostat has a target and a tolerance. Above the range, the AC turns on. Below, the heat turns on. Inside the range, it does nothing, and it is not confused about doing nothing.",
+    rule:"Before you touch an order, name the state out loud: winner, loser, or hold. If you cannot name it from the plan, you are not managing the trade. You are reacting to it.",
+    example:"Plan: exit half the position when the contract reaches $2.60, exit all if the stock closes below $48.50. Contract is at $1.90 and stock at $51.80. State: hold. Contract hits $2.60: state changes to winner and the scale‑out executes."
+  },
+  {
+    id:"consistent", icon:"🔁", color:BL, title:"Consistent execution",
+    short:"Do the same thing every time, so the results can teach you something.",
+    what:"Consistency means responding to the same condition the same way, trade after trade, even when a given trade tempts you to do otherwise.",
+    why:"A single trade can win for the wrong reason or lose for the right one. Only a consistent process produces results you can actually evaluate. Inconsistent execution makes every result noise.",
+    analogy:"A recipe tested with a different oven temperature every time never tells you whether the recipe works. Hold the temperature steady, and the results start to mean something.",
+    rule:"Execute the plan as written for the entire sample before you judge it. Change nothing mid‑sample.",
+    example:"Ten swing trades, all planned with the same invalidation rule. On trade four you widen the stop because you have a feeling. The trade recovers and wins. You now have nine data points, not ten, and a bad habit with a reward attached to it."
+  },
+  {
+    id:"journal", icon:"📓", color:PU, title:"Trade journaling",
+    short:"If it is not recorded, it did not teach you anything.",
+    what:"The journal records what the plan said, what price did, what you did, and how the trade closed. It is the bridge between this trade and a better next one.",
+    why:"Memory rewrites losses as bad luck and wins as skill. The journal keeps the honest version, so your review works from what happened rather than what you remember.",
+    analogy:"A fitness log. Nobody remembers what they lifted six weeks ago, but the log does, and the log is the only reason the program can be adjusted intelligently.",
+    rule:"Log every trade the day it closes. Record the plan, the trigger, the execution, and one line on how you felt at the exit.",
+    example:"Entry $1.30, plan target $2.60, plan invalidation stock below $48.50. Result: exited at $2.15 after a red candle, target never hit. Note: 'Left the plan early. Fear, not chart.' That one line is worth more than the profit."
+  },
+  {
+    id:"data", icon:"📊", color:GD, title:"Data before adjustment",
+    short:"Change the process because of a pattern, never because of a trade.",
+    what:"Adjustment means changing a rule in the plan: a different target method, a tighter invalidation, a smaller size. Data means a set of journaled trades, not the one that just stung.",
+    why:"Every rule will look wrong on some individual trade. Rules are judged on the body of results they produce. A rule that loses one trade and wins seven is a good rule that you almost deleted.",
+    analogy:"A coach does not rewrite the playbook after one dropped pass. They review the game film across the season and change the plays that fail repeatedly.",
+    rule:"Never change a rule during a live trade. Review the sample first, then change one variable at a time.",
+    example:"Three trailing‑stop exits in a row got stopped out right before price ran higher. Painful, but three trades. Keep executing, journal all of them, and evaluate after the full sample. If the pattern holds across twenty, adjust the trailing distance. If not, it was three trades."
+  },
+];
+
+function TabProcess({goTab}){
+  const[open,setOpen]=useState("plan");
+  return(
+    <div className="fu">
+      <QDA
+        question="What is price doing relative to my plan?"
+        options={["Winner","Loser","Hold"]}
+        action="The decisions were made in Module 5. Your job now is to observe price, identify which predefined condition is occurring, and respond exactly the way the plan says. Then record it."
+        color={OR}
+      />
+
+      <SectionLabel label="Start here every time you open the chart" sub="Three conditions. Three paths. Pick the one that matches what price is actually doing." color={OR}/>
+      <div className="g3" style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:"10px",marginBottom:"18px"}}>
+        {PATHS.map(p=>(
+          <div key={p.tab} onClick={()=>goTab(p.tab)}
+            style={{background:CA,border:"1px solid "+BD,borderTop:"3px solid "+p.color,borderRadius:"12px",padding:"14px",cursor:"pointer",transition:"transform 0.15s, box-shadow 0.15s"}}
+            onMouseOver={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 6px 18px rgba(0,0,0,0.08)";}}
+            onMouseOut={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="none";}}>
+            <div style={{fontSize:"1.4rem",marginBottom:"6px"}}>{p.icon}</div>
+            <div style={{fontSize:"0.62rem",fontWeight:"700",letterSpacing:"0.1em",textTransform:"uppercase",color:p.color,marginBottom:"4px"}}>{p.cond}</div>
+            <div style={{fontWeight:"700",fontSize:"0.9rem",color:DK,marginBottom:"6px"}}>{p.label}</div>
+            <div style={{fontSize:"0.74rem",color:"#5a4535",lineHeight:"1.5",fontStyle:"italic"}}>"{p.q}"</div>
+            <div style={{marginTop:"10px",fontSize:"0.7rem",fontWeight:"700",color:p.color}}>Open path →</div>
+          </div>
+        ))}
+      </div>
+
+      <InfoCard icon="🧭" title="Why this module is a field guide, not a course" color={OR}>
+        You will not move through these paths once, in order. You will come back to whichever one matches the trade in front of you, sometimes several times in a single position. A swing trade might sit in Stay With the Trade for a week, jump to Manage a Winner for a scale‑out, then return to Stay. That is normal. The tabs are places to stand, not steps to finish.
+      </InfoCard>
+
+      <div style={{marginTop:"18px"}}>
+        <SectionLabel label="The process underneath every path" sub="Five habits that make trade management repeatable. Tap each to expand." color={OR}/>
+        {PROCESS_CARDS.map(c=>(
+          <ExpandableCard key={c.id} accent={c.color} icon={c.icon} title={c.title} shortDesc={c.short}
+            isOpen={open===c.id} onToggle={()=>setOpen(open===c.id?null:c.id)}>
+            <Concept what={c.what} why={c.why} analogy={c.analogy} rule={c.rule} example={c.example} color={c.color}/>
+          </ExpandableCard>
+        ))}
+      </div>
+
+      <Resources items={TOOLS}/>
+      <NextBtn label="Manage a Winner" onClick={()=>goTab(1)}/>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TAB 2 — MANAGE A WINNER
+// ═══════════════════════════════════════════════════════════════
+const WINNER_CARDS = [
+  {
+    id:"target", icon:"🎯", color:GR, title:"Profit targets",
+    short:"A predefined price or premium where you exit some or all of the position.",
+    what:"A profit target is a specific level, on the stock or on the contract, where the plan says to take gains. It is chosen before entry, usually from chart structure or a fixed return on premium.",
+    why:"A target turns 'I am up' into a decision. Without one, gains float until a red candle forces a panicked choice. With one, the exit is a fill, not a feeling.",
+    analogy:"A road trip with a destination typed into the map. You might stop early for a reason, but you always know exactly where the drive was supposed to end.",
+    rule:"Set the target before entry and write it on the planner. When price reaches it, execute. Do not renegotiate with the chart at the target.",
+    example:"Stock at $50, resistance at $54. You buy a call at $1.30 and set the target at $2.60, a 100% gain on premium. Stock runs to $54.10, contract prints $2.65. You exit at $2.60 as planned: $130 profit per contract. Whatever the stock does next is not your trade anymore.",
+    green:["Target sits at a real chart level: resistance, a prior high, a measured move","Target was written down before the entry","Target gives the trade a favorable reward compared to the invalidation distance"],
+    red:["Target is 'as much as I can get'","Target moved higher after price got close to it","Target was chosen after entry because the trade started working"]
+  },
+  {
+    id:"scale", icon:"🪜", color:GR, title:"Scaling out",
+    short:"Exit part of the position at one level and let the rest keep working.",
+    what:"Scaling out means closing a portion of the contracts at a predefined level, then managing the remainder with a different rule, often a trailing stop or a second target.",
+    why:"It resolves the tension between locking in gains and letting a winner run. Part of the trade is finished and paid. The rest can pursue a bigger move with less pressure on you.",
+    analogy:"Harvesting a garden in stages. Pick what is ripe today, leave the rest on the vine to grow. You eat well now and still have a crop coming.",
+    rule:"Decide the split and the levels before entry, for example half at the first target, half trailed. Never scale out because you feel nervous. Scale out because the level printed.",
+    example:"You hold 4 contracts bought at $1.30, total cost $520. Plan: exit 2 at $2.00, trail the other 2. Contract hits $2.00, you exit 2 for $400. Your remaining 2 contracts cost $260, and you have already taken $400 out. The rest of the trade is playing with house money, by design rather than by luck.",
+    green:["Split and levels are on the planner","The remaining contracts have their own management rule","Position size was large enough to divide (4 contracts, not 1)"],
+    red:["Selling one contract 'just to feel better'","No rule for what happens to the remainder","Scaling out of a 1‑contract position, which is just exiting"]
+  },
+  {
+    id:"trail", icon:"🪢", color:GR, title:"Trailing mechanisms",
+    short:"An exit that follows price higher and only triggers when price pulls back a set amount.",
+    what:"A trailing mechanism is a moving exit condition. As the stock rises, the exit level rises with it. When price reverses by your predefined distance, the trade exits. Common versions: a fixed dollar amount below the high, a moving average, or the low of the prior candle on your timeframe.",
+    why:"It lets a strong move keep paying you without requiring a fixed target you might have guessed too low. It also guarantees you give back only the amount you chose in advance.",
+    analogy:"A dog on a retractable leash. It can run as far as it wants in the open field, but the moment it turns back toward you past a certain point, the leash locks.",
+    rule:"Choose the trailing method and distance before entry, using the timeframe your plan was built on. Move the exit only in the direction of the trade, never against it.",
+    example:"Swing call bought at $1.30 with the stock at $50. Trailing rule: exit if the stock closes below the prior day's low. Stock climbs $51, $52.50, $53.80 over four days. Day five closes at $52.90, below day four's low of $53.10. You exit the contract around $2.30, roughly $100 profit per contract, and the trail did its job.",
+    green:["Trailing distance matches the volatility of the timeframe","The trail is checked on the planned timeframe, not a faster one","Exit level only ever moves up"],
+    red:["Trail set so tight that ordinary wiggle stops you out","Moving the trail lower to 'give it room' after a red candle","Switching to a 5‑minute chart to manage a daily‑chart trade"]
+  },
+  {
+    id:"structure", icon:"📐", color:GR, title:"Price structure and trendlines",
+    short:"Let the chart's own levels tell you where the move is intact and where it is not.",
+    what:"Structure‑based management uses the levels from Technical Analysis, such as trendlines, higher lows, and prior resistance turned support, as the reference for staying in or taking gains. The move is 'working' while structure holds.",
+    why:"Structure is objective and visible. It gives a winner a reason to stay open that is not 'I hope it goes higher' and a reason to exit that is not 'I got scared.'",
+    analogy:"Climbing a staircase in the dark. As long as each step is where you expect it, you keep going. The moment your foot finds no step, you stop.",
+    rule:"Mark the structure that defines the move before entry. Stay in while the stock makes higher lows above your trendline. Take gains or tighten when structure breaks.",
+    example:"Stock at $50 breaks out above $49.50 resistance and makes higher lows at $50.40 and $51.60. Your call runs from $1.30 to $2.40. Price then closes below the $51.60 higher low. Structure is broken. You exit at $2.10, still a $80 per‑contract gain, and the chart, not your nerves, made the call.",
+    green:["Higher lows continue on the planned timeframe","Pullbacks hold above the trendline or prior resistance","Volume supports the move (see the Technical Analysis module)"],
+    red:["A close below the most recent higher low","Trendline broken and retested from below","You redrew the trendline so the trade still 'works'"]
+  },
+  {
+    id:"run", icon:"🏃", color:GR, title:"Letting winners run",
+    short:"Staying in a working trade is a decision too, and it needs a rule behind it.",
+    what:"Letting a winner run means choosing not to exit while your profit‑management condition has not occurred. It is not passivity. It is the plan telling you to hold, backed by structure or a trail that will get you out when the move ends.",
+    why:"Most of a trader's total profit comes from a small number of large winners. Cutting those short to feel safe is the most expensive habit in trading, and it feels responsible while you are doing it.",
+    analogy:"Letting bread rise. Opening the oven every two minutes to check does nothing but let the heat out. Set the timer, trust the process, and check when the timer says to.",
+    rule:"If no profit‑management condition has occurred, hold. Protect the trade with your trail or structure rule, and check it on the planned timeframe only.",
+    example:"Call bought at $1.30, stock at $50. Structure holds, no target hit, trail intact. Contract at $1.80 and you want to exit because it is 'a nice gain.' The plan says hold. Two weeks later the trail finally triggers at $3.10. The difference between $50 and $180 per contract was doing nothing.",
+    green:["Plan explicitly names the hold condition","A trail or structure rule is protecting the position","You are checking the chart on schedule, not constantly"],
+    red:["Exiting because the gain 'feels big enough'","Holding with no protective rule at all, which is hope, not a plan","Checking the position every few minutes on a swing trade"]
+  },
+];
+
+function TabWinner({goTab}){
+  const[open,setOpen]=useState("target");
+  return(
+    <div className="fu">
+      <QDA
+        question="Price is moving my way. Has a profit‑management condition from my plan occurred?"
+        options={["Yes → Execute it","Not yet → Hold"]}
+        action="Look at the planner, not the P/L. If the target printed, the scale‑out level hit, or the trail triggered, execute that response now. If none of them occurred, this is still a hold. Go to Stay With the Trade."
+        color={GR}
+      />
+
+      <InfoCard icon="🧩" title="There is no single correct exit" color={GR}>
+        These five mechanisms are tools, not a ranking. A scalper and a LEAP holder will not manage a winner the same way, and neither of them is wrong. What matters is that you chose your mechanism before entry and apply it the same way every time. Pick one or two that fit your style from Module 5, and master those.
+      </InfoCard>
+
+      <div style={{marginTop:"18px"}}>
+        <SectionLabel label="Profit‑management mechanisms" sub="Each one protects gains while letting the trade keep working. Tap to expand." color={GR}/>
+        {WINNER_CARDS.map(c=>(
+          <ExpandableCard key={c.id} accent={c.color} icon={c.icon} title={c.title} shortDesc={c.short}
+            isOpen={open===c.id} onToggle={()=>setOpen(open===c.id?null:c.id)}>
+            <Concept what={c.what} why={c.why} analogy={c.analogy} rule={c.rule} example={c.example} color={c.color}
+              extra={<GreenRed green={c.green} red={c.red} greenLabel="Working as designed" redLabel="Warning signs"/>}/>
+          </ExpandableCard>
+        ))}
+      </div>
+
+      <div style={{marginTop:"18px",background:CA,border:"1px solid "+BD,borderRadius:"14px",overflow:"hidden"}}>
+        <div style={{background:"#f0e8da",padding:"12px 16px",borderBottom:"1px solid "+BD}}>
+          <div style={{fontWeight:"700",fontSize:"0.82rem",color:DK}}>📋 Choosing a mechanism</div>
+          <div style={{fontSize:"0.72rem",color:"#8a7560",marginTop:"2px"}}>Decide this on the planner before entry, not on the chart after.</div>
+        </div>
+        <div style={{overflowX:"auto"}}>
+          <table style={{width:"100%",borderCollapse:"collapse",minWidth:"560px"}}>
+            <thead><tr style={{background:"#faf6ef"}}>
+              {["Mechanism","Best when","Trade‑off","Decide before entry"].map(h=>(
+                <th key={h} style={{textAlign:"left",padding:"10px 14px",fontSize:"0.62rem",fontWeight:"700",letterSpacing:"0.1em",textTransform:"uppercase",color:"#8a7560",borderBottom:"1px solid "+BD}}>{h}</th>
+              ))}
+            </tr></thead>
+            <tbody>
+              {[
+                ["Profit target","A clear level is visible on the chart","Caps the gain if the move keeps going","The exact price or premium"],
+                ["Scaling out","You hold multiple contracts and want both certainty and upside","Smaller position left to ride","The split and each level"],
+                ["Trailing stop","Momentum is strong and the top is unknown","Gives back some gain on the reversal","Method and distance, on the planned timeframe"],
+                ["Price structure","Trend is clean with visible higher lows","Requires reading the chart honestly","Which level defines the move"],
+                ["Let it run","No condition has triggered","Requires patience and a protective rule","What will eventually get you out"],
+              ].map((r,i)=>(
+                <tr key={i} style={{borderBottom:"1px solid "+BD}}>
+                  {r.map((c,j)=>(<td key={j} style={{padding:"10px 14px",fontSize:"0.76rem",color:j===0?DK:"#5a4535",fontWeight:j===0?"700":"400",lineHeight:"1.5"}}>{c}</td>))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <PathSwitch current={1} goTab={goTab}/>
+      <Resources items={TOOLS.filter(t=>["Trade Planner","Technical Analysis","Trade Journal"].includes(t.label))}/>
+      <NextBtn label="Manage a Loser" onClick={()=>goTab(2)}/>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TAB 3 — MANAGE A LOSER
+// ═══════════════════════════════════════════════════════════════
+const LOSER_CARDS = [
+  {
+    id:"normal", icon:"🌊", color:RD, title:"Normal adverse movement",
+    short:"Price going against you for a while is part of almost every winning trade.",
+    what:"Adverse movement is any move against your direction that stays above your invalidation level. Pullbacks, red days, and consolidation all qualify. They are ordinary, and they are not a signal.",
+    why:"If you treat every red candle as a reason to exit, you will exit nearly every trade early, including the ones that were about to work. The invalidation level exists precisely so that you can ignore the noise above it.",
+    analogy:"Turbulence on a flight. It is uncomfortable, it is expected, and it is not the same thing as the plane going down. The pilot does not divert for turbulence.",
+    rule:"While the stock is above your invalidation level, adverse movement is a hold. Do not exit, do not tighten, do not 'watch it closely.' Check it on the planned timeframe and move on.",
+    example:"Stock at $50, call bought at $1.30, invalidation set at a close below $48.50. Stock pulls back to $49.20 and your contract drops to $0.95. Painful, but $49.20 is above $48.50. The plan says hold. Three days later the stock is at $52.40 and the contract is $2.10."
+  },
+  {
+    id:"thesis", icon:"🔍", color:RD, title:"Is the thesis still valid?",
+    short:"The question is not 'am I down.' It is 'has the reason I entered stopped being true.'",
+    what:"Your thesis is the chart reason you entered from Module 5: a breakout, a bounce off support, a trend continuation. It is either still intact or it is not, and the answer lives on the chart, not in your P/L.",
+    why:"A trade can be red while the thesis is perfectly intact, and green while it has quietly failed. Managing to the thesis instead of the P/L is what separates a managed loss from a random one.",
+    analogy:"You planted tomatoes because the forecast said sun. A cloudy afternoon does not change the forecast. A week of frost does. Check the forecast, not the sky outside the window right now.",
+    rule:"Every time the trade is red, re‑read the thesis on the planner and ask one question: has the chart done the specific thing that would make this thesis wrong? If not, hold.",
+    example:"Thesis: stock bounced off $49 support with a bullish engulfing candle, so you bought a call at $1.30. Two days later the stock is $49.60 and the contract is $1.05. Support at $49 still holds. Thesis intact, hold. If the stock had closed at $48.40, support failed and the thesis is gone."
+  },
+  {
+    id:"invalidation", icon:"⛔", color:RD, title:"Predefined invalidation",
+    short:"The one level that says 'I was wrong,' chosen when you were calm.",
+    what:"Invalidation is the price condition, set in Module 5, at which the trade thesis is proven wrong. It is usually a close below a support level, a trendline, or a specific stock price. It is not a dollar loss on the contract, though the two are connected.",
+    why:"Invalidation is the only exit decision made with a clear head. Every decision you make while the trade is red is made under stress. The level you set before entry is the best judgment you will have about this trade.",
+    analogy:"A fire escape plan drawn up on a normal Tuesday. Nobody designs a good exit route while the smoke alarm is going off. You follow the one that was drawn when you could think.",
+    rule:"Write the invalidation level on the planner before entry. Never move it further from price once you are in the trade. Moving it closer is allowed. Moving it away is not.",
+    example:"Stock at $50, call at $1.30, invalidation is a daily close below $48.50. The stock closes at $48.30. Your contract is worth $0.70. The plan says exit. Loss: $60 per contract instead of the full $130. That $70 difference, repeated across dozens of trades, is where accounts survive."
+  },
+  {
+    id:"honor", icon:"🤝", color:RD, title:"Honor the exit",
+    short:"When the invalidation condition occurs, the trade is already over. Your job is the click.",
+    what:"Honoring the exit means executing the invalidation response immediately when the condition occurs, without waiting for a bounce, without averaging down, without checking one more timeframe.",
+    why:"The moment after invalidation is when losses turn from small and planned into large and unplanned. Every reason to wait sounds reasonable, and every one of them is your position talking, not the chart.",
+    analogy:"The smoke alarm goes off and you leave the building. You do not stay to see whether it is a real fire. The alarm was the decision. Leaving is just the follow‑through.",
+    rule:"Exit the trade on the candle that confirms invalidation, on the timeframe your plan specified. Do not add contracts to a losing position to lower your average. Do not move to a longer timeframe to make the break disappear.",
+    example:"Invalidation was a daily close below $48.50. The daily candle closes at $48.30. You feel the urge to check the weekly chart, where it still 'looks fine.' The plan was written on the daily. You exit at $0.70. The next day the stock opens at $47.10 and the contract is $0.35."
+  },
+  {
+    id:"log", icon:"📓", color:RD, title:"Log the outcome",
+    short:"A loss that is journaled is data. A loss that is not is just damage.",
+    what:"Logging a loser means recording the thesis, the invalidation level, where you actually exited, and whether you honored the plan. It also means recording how it felt, in one line.",
+    why:"Losers carry the most information about your process. Did the invalidation level make sense? Was the thesis weak from the start? Did you honor the exit? None of those questions can be answered without a record.",
+    analogy:"An incident report after a near miss at work. Nobody enjoys writing it, and it is the only reason the next one gets prevented.",
+    rule:"Log the losing trade the same day, before you look for the next setup. Write down whether you followed the plan, separate from whether you lost money.",
+    example:"Entry $1.30, thesis: support bounce at $49. Invalidation: close below $48.50. Exit: $0.70, honored. Loss $60 per contract. Note: 'Followed plan. Loss was the cost of finding out.' That is a good trade that lost money, and the journal knows the difference."
+  },
+];
+
+function TabLoser({goTab}){
+  const[open,setOpen]=useState("normal");
+  return(
+    <div className="fu">
+      <QDA
+        question="Price is moving against me. Has my predefined invalidation condition occurred?"
+        options={["Yes → Exit the trade","No → Hold"]}
+        action="Check the chart against the invalidation level written on your planner, on the timeframe the plan specified. If the condition has occurred, exit now. If it has not, this is ordinary adverse movement and you hold. Being red is not a condition."
+        color={RD}
+      />
+
+      <AskYourself
+        color={RD}
+        question="Has the chart done the specific thing that would prove my entry thesis wrong?"
+        noLabel="No"
+        no="This is adverse movement, not invalidation. Hold the position and stop watching it. Go to Stay With the Trade."
+        yesLabel="Yes"
+        yes="The trade is over. Exit on this candle at market. Then log it, including whether you honored the plan."
+      />
+
+      <div style={{marginTop:"18px"}}>
+        <SectionLabel label="From red candle to honored exit" sub="How to tell noise from invalidation, and what to do once you know. Tap to expand." color={RD}/>
+        {LOSER_CARDS.map(c=>(
+          <ExpandableCard key={c.id} accent={c.color} icon={c.icon} title={c.title} shortDesc={c.short}
+            isOpen={open===c.id} onToggle={()=>setOpen(open===c.id?null:c.id)}>
+            <Concept what={c.what} why={c.why} analogy={c.analogy} rule={c.rule} example={c.example} color={c.color}/>
+          </ExpandableCard>
+        ))}
+      </div>
+
+      <div style={{marginTop:"18px"}}>
+        <SectionLabel label="Still valid, or invalidated?" sub="A quick reference for the moment you are staring at a red position." color={RD}/>
+        <GreenRed
+          greenLabel="Thesis still valid — hold"
+          redLabel="Thesis invalidated — exit"
+          green={[
+            "Stock is red but still above the invalidation level",
+            "Support or trendline from the thesis is holding on the planned timeframe",
+            "The move against you is on lighter volume than the move that got you in",
+            "Nothing on the chart has changed except the P/L"
+          ]}
+          red={[
+            "A close below the invalidation level on the planned timeframe",
+            "The support or trendline the thesis was built on has failed",
+            "You are looking for reasons to stay rather than checking a level",
+            "You are considering adding contracts to lower your average"
+          ]}
+        />
+      </div>
+
+      <InfoCard icon="🛡️" title="A note on size" color={GD}>
+        How much a single loser is allowed to cost you is a position‑sizing decision, and it belongs in the Risk Management module (coming soon). This module assumes that decision was already made in Module 5. If a red trade feels unbearable to hold above invalidation, the problem is usually the size, not the plan.
+      </InfoCard>
+
+      <PathSwitch current={2} goTab={goTab}/>
+      <Resources items={TOOLS.filter(t=>["Trade Planner","Technical Analysis","Trade Journal","Risk Management"].includes(t.label))}/>
+      <NextBtn label="Stay With the Trade" onClick={()=>goTab(3)}/>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TAB 4 — STAY WITH THE TRADE
+// ═══════════════════════════════════════════════════════════════
+const STAY_CARDS = [
+  {
+    id:"none", icon:"🟰", color:BL, title:"No condition triggered",
+    short:"Most of the life of a trade is spent here. Get comfortable.",
+    what:"The hold state is any moment when neither the profit‑management condition nor the invalidation condition has occurred. On a swing trade, this is most days. On a LEAP, it is most months.",
+    why:"Traders lose more money by acting in the hold state than in either of the other two. Every unplanned action here, early exits, adding, tightening, is a decision the plan never asked for.",
+    analogy:"A slow cooker. Six hours of nothing happening is the recipe working. Lifting the lid to check does not speed it up. It only lets the heat out.",
+    rule:"If you cannot point to a written condition that has occurred, your action is no action. Close the chart and come back at the next scheduled check.",
+    example:"Swing call bought at $1.30, target $2.60, invalidation a close below $48.50. Day three: stock $50.90, contract $1.45. Target no. Invalidation no. Hold. Day four: stock $50.30, contract $1.20. Target no. Invalidation no. Hold. The trade is doing exactly what trades do."
+  },
+  {
+    id:"observe", icon:"👁️", color:BL, title:"Observe, don't interfere",
+    short:"Watching the trade and touching the trade are two different jobs. Only one is yours.",
+    what:"Observing means checking price against the plan on the schedule your timeframe dictates. Interfering means changing the plan or the position because of what you saw during the check.",
+    why:"Each time you interfere, you replace a decision made calmly before entry with one made under pressure during it. Your calm self is the better trader. Let that version keep the wheel.",
+    analogy:"A lifeguard watches every swimmer and gets in the water only when someone is actually in trouble. Jumping in every time a swimmer ducks under would be exhausting and useless.",
+    rule:"Check the chart at fixed times that match the planned timeframe, for example the daily close for a swing trade. Between checks, the platform stays closed.",
+    example:"Your plan is built on daily candles. You check once after the close at 4 pm. Midday the stock drops $0.80 and you never see it, because you were not looking. By the close it has recovered. You held through a move that would have shaken you out at 1 pm."
+  },
+  {
+    id:"chart", icon:"🧠", color:BL, title:"Chart vs. emotion",
+    short:"Learn to tell whether the signal came from the screen or from your stomach.",
+    what:"An emotional signal is an urge to act that cannot be traced to a written condition. A chart signal is a condition from the plan that has visibly occurred. They feel identical from the inside, which is the whole problem.",
+    why:"Fear says exit a winner too early. Hope says hold a loser too long. Boredom says add to a position that does not need it. None of those are on your planner, and all of them feel urgent.",
+    analogy:"Hunger versus a craving. Both feel like a need to eat. Only one of them is your body actually asking for food. The trick is pausing long enough to tell which one is talking.",
+    rule:"Before any action, name the condition from the planner that justifies it. If the sentence starts with 'I feel like' or 'I have a feeling,' you have found an emotion, not a signal. Do nothing.",
+    example:"Contract up from $1.30 to $1.75. You want to exit. Which condition occurred? Target is $2.60, no. Trail triggered? No. The sentence is 'I feel like it might come back down.' Emotion. Hold. The trade does not care how you feel about it."
+  },
+  {
+    id:"maintain", icon:"📌", color:BL, title:"Maintain the plan",
+    short:"The plan is allowed to update in only one direction: tighter, never looser.",
+    what:"Maintaining the plan means keeping the written conditions unchanged during the trade, with one exception: moving a protective exit in the direction of the trade as structure develops, such as raising a stop under a new higher low.",
+    why:"Plans that loosen under pressure are not plans. Every widened stop and stretched target is the position rewriting the rules to protect itself, and it always sounds reasonable in the moment.",
+    analogy:"A budget. Moving money from dining out to savings mid‑month is maintenance. Raising the dining budget because you already overspent is the budget quietly ceasing to exist.",
+    rule:"Never move an invalidation level away from price. Never move a target further from price after entry. Tightening a protective exit behind a confirmed higher low is the only permitted change.",
+    example:"Invalidation was a close below $48.50. The stock rallies to $52 and forms a higher low at $50.60. Raising invalidation to a close below $50.60 is maintenance and protects gains. The stock then drifts to $50.80 and you consider dropping the level back to $48.50 'for room.' That is loosening. Not allowed."
+  },
+  {
+    id:"patience", icon:"⏳", color:BL, title:"Patience and discipline",
+    short:"These are not personality traits. They are the result of having a plan you trust.",
+    what:"Patience is the ability to sit in the hold state without acting. Discipline is executing the plan when a condition does occur, even when you would rather not. Both come from a written plan, not from willpower.",
+    why:"Willpower runs out, usually around the third red day. A plan does not. If staying with a trade feels like a constant fight, the fix is a clearer plan or a smaller size, not more grit.",
+    analogy:"Waiting for a kettle to boil. Nobody stands over it straining with willpower. You know how long it takes, so you do something else and come back when it whistles.",
+    rule:"Decide your check‑in schedule before entry and put it on the planner. Outside those check‑ins, the trade does not exist. If patience is failing, reduce size on the next trade rather than fighting this one.",
+    example:"Plan: swing trade, check daily after close. Day two you check at 10 am, noon, and 2 pm anyway. Each check produces an urge to do something. Note it in the journal: 'Checked off‑schedule three times, felt like exiting each time.' The fix on the next trade is the schedule, not the plan."
+  },
+];
+
+function TabStay({goTab}){
+  const[open,setOpen]=useState("none");
+  return(
+    <div className="fu">
+      <QDA
+        question="Neither the profit‑management condition nor the invalidation condition has occurred. What do I do?"
+        options={["Nothing","Something"]}
+        action="Managing a position does not mean acting on it. If no written condition has occurred, your job is to keep observing the trade against the plan on the planned timeframe. The plan is still in force. Let it work."
+        color={BL}
+      />
+
+      <div className="g3" style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:"10px",marginBottom:"18px"}}>
+        {[
+          {n:"1",color:BL,title:"Check on schedule",desc:"Open the chart at the times your timeframe dictates. Daily close for a swing. Weekly for a LEAP."},
+          {n:"2",color:BL,title:"Compare to the plan",desc:"Target hit? Invalidation hit? Trail triggered? Structure broken? Answer each from the planner."},
+          {n:"3",color:BL,title:"Close the platform",desc:"If every answer is no, the check is over. There is nothing to do until the next one."},
+        ].map(s=>(
+          <div key={s.n} style={{background:CA,border:"1px solid "+BD,borderRadius:"10px",padding:"14px",borderTop:"3px solid "+s.color}}>
+            <div style={{width:"24px",height:"24px",borderRadius:"50%",background:s.color,color:"#fff",fontWeight:"700",fontSize:"0.78rem",display:"flex",alignItems:"center",justifyContent:"center",marginBottom:"8px"}}>{s.n}</div>
+            <div style={{fontWeight:"700",fontSize:"0.82rem",color:DK,marginBottom:"4px"}}>{s.title}</div>
+            <div style={{fontSize:"0.72rem",color:"#5a4535",lineHeight:"1.5"}}>{s.desc}</div>
+          </div>
+        ))}
+      </div>
+
+      <SectionLabel label="Holding well" sub="Five ideas that make the hold state easier to sit in. Tap to expand." color={BL}/>
+      {STAY_CARDS.map(c=>(
+        <ExpandableCard key={c.id} accent={c.color} icon={c.icon} title={c.title} shortDesc={c.short}
+          isOpen={open===c.id} onToggle={()=>setOpen(open===c.id?null:c.id)}>
+          <Concept what={c.what} why={c.why} analogy={c.analogy} rule={c.rule} example={c.example} color={c.color}/>
+        </ExpandableCard>
+      ))}
+
+      <div style={{marginTop:"18px",background:CA,border:"1px solid "+BD,borderRadius:"14px",overflow:"hidden"}}>
+        <div style={{background:"#f0e8da",padding:"12px 16px",borderBottom:"1px solid "+BD}}>
+          <div style={{fontWeight:"700",fontSize:"0.82rem",color:DK}}>📋 The urge, the chart, and the plan</div>
+          <div style={{fontSize:"0.72rem",color:"#8a7560",marginTop:"2px"}}>Common hold‑state urges and what to do with them.</div>
+        </div>
+        <div style={{overflowX:"auto"}}>
+          <table style={{width:"100%",borderCollapse:"collapse",minWidth:"560px"}}>
+            <thead><tr style={{background:"#faf6ef"}}>
+              {["What you feel","What the chart says","What you do"].map(h=>(
+                <th key={h} style={{textAlign:"left",padding:"10px 14px",fontSize:"0.62rem",fontWeight:"700",letterSpacing:"0.1em",textTransform:"uppercase",color:"#8a7560",borderBottom:"1px solid "+BD}}>{h}</th>
+              ))}
+            </tr></thead>
+            <tbody>
+              {[
+                ["\"It's up, I should lock it in\"","Target not hit, trail not triggered","Hold. Journal the urge."],
+                ["\"It's down, I should get out\"","Above invalidation, thesis intact","Hold. Check again at the next scheduled close."],
+                ["\"It's flat, I should add\"","No condition in the plan says add","Hold. Adding is a new trade with a new plan."],
+                ["\"I should tighten my stop\"","A new higher low has formed","Raise the invalidation to below the higher low. This is allowed."],
+                ["\"I should give it more room\"","Price is near invalidation","Do not move it. Loosening is never allowed."],
+                ["\"Let me check a faster chart\"","Plan was built on the daily","Stay on the daily. The faster chart is noise for this trade."],
+              ].map((r,i)=>(
+                <tr key={i} style={{borderBottom:"1px solid "+BD}}>
+                  {r.map((c,j)=>(<td key={j} style={{padding:"10px 14px",fontSize:"0.76rem",color:j===0?DK:"#5a4535",fontStyle:j===0?"italic":"normal",lineHeight:"1.5"}}>{c}</td>))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <PathSwitch current={3} goTab={goTab}/>
+      <Resources items={TOOLS.filter(t=>["Trade Planner","Technical Analysis","Trade Journal"].includes(t.label))}/>
+      <NextBtn label="Execute & Evaluate" onClick={()=>goTab(4)}/>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TAB 5 — EXECUTE & EVALUATE
+// ═══════════════════════════════════════════════════════════════
+const JOURNAL_FIELDS = [
+  {k:"Ticker and contract",v:"Strike, expiration, direction"},
+  {k:"Thesis",v:"The chart reason you entered, in one sentence"},
+  {k:"Plan",v:"Entry premium, target or mechanism, invalidation level, timeframe"},
+  {k:"What price did",v:"Which condition occurred, and when"},
+  {k:"What you did",v:"Exit premium, and whether it matched the plan"},
+  {k:"Result",v:"Dollars and percent, per contract and total"},
+  {k:"Followed the plan?",v:"Yes or no. This is separate from the result."},
+  {k:"One line on how it felt",v:"Especially at the exit"},
+];
+
+function TabExecute({goTab}){
+  return(
+    <div className="fu">
+      <QDA
+        question="A condition from my plan has occurred. Now what?"
+        options={["Execute","Hesitate"]}
+        action="Do the thing the plan says, on the candle that confirmed it. Then record what happened. Then, and only after a body of trades, look at the results and change one thing. This is the loop that turns trading into a process."
+        color={OR}
+      />
+
+      <StepCard step="Step 1" title="Execute the plan" color={GR}>
+        When the profit‑management condition or the invalidation condition occurs, the decision is already made. Place the order. The only thing you are deciding at this moment is whether to be the kind of trader whose plans mean something.
+        <RuleBox color={GR} rule="Execute on the confirming candle of the planned timeframe. Use a market order to exit unless your plan specified a limit. Do not wait for 'one more candle.' The plan already told you which candle."/>
+        <InfoBox icon="🧮" label="Example" bg="#e8faf3" green>
+          Target was a contract price of $2.60. The contract prints $2.62. You exit at $2.60 with a limit that fills immediately: $130 profit per contract. The stock runs another $2 the next day. You did not miss anything. That was not your trade, and the journal will show a plan executed cleanly.
+        </InfoBox>
+      </StepCard>
+
+      <StepCard step="Step 2" title="Record the trade" color={PU}>
+        Log it the same day, before you look for the next setup. The record is the raw material for everything that follows. Until Dominique's Trade Journal is linked here, use these fields in whatever format you keep.
+        <div className="g2" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"6px",margin:"12px 0"}}>
+          {JOURNAL_FIELDS.map(f=>(
+            <div key={f.k} style={{background:"#f7f0e6",borderRadius:"8px",padding:"9px 12px",borderLeft:"3px solid "+PU}}>
+              <div style={{fontSize:"0.72rem",fontWeight:"700",color:DK,marginBottom:"2px"}}>{f.k}</div>
+              <div style={{fontSize:"0.72rem",color:"#5a4535",lineHeight:"1.45"}}>{f.v}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{display:"flex",gap:"8px",flexWrap:"wrap"}}>
+          <LinkBtn label="📓 Open the Trade Journal" url={LINK.journal}/>
+          <LinkBtn label="📝 Open your Trade Planner" url={LINK.planner} color={OR}/>
+        </div>
+      </StepCard>
+
+      <StepCard step="Step 3" title="Review execution, not just results" color={BL}>
+        Every trade lands in one of four boxes. Judge yourself on the column, not the row. A plan followed that lost money is a good trade. A plan broken that made money is the most dangerous kind, because it rewards the habit that will eventually cost you.
+        <div className="g2" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"8px",marginTop:"12px"}}>
+          {[
+            {t:"Followed plan · Won",bg:"#e8faf3",c:GR,tx:"#052e16",d:"The process worked. Nothing to change. Log it and move on."},
+            {t:"Followed plan · Lost",bg:"#e8faf3",c:GR,tx:"#052e16",d:"Also the process working. Losses are the cost of finding out. Log it and move on."},
+            {t:"Broke plan · Won",bg:"#fff0ee",c:RD,tx:"#5a1a1a",d:"A warning dressed as a reward. Write down exactly what you did instead of the plan, and why."},
+            {t:"Broke plan · Lost",bg:"#fff0ee",c:RD,tx:"#5a1a1a",d:"The most instructive box. What was the urge, and which condition did you tell yourself had occurred?"},
+          ].map(b=>(
+            <div key={b.t} style={{background:b.bg,borderRadius:"10px",padding:"12px 14px",borderTop:"3px solid "+b.c}}>
+              <div style={{fontSize:"0.72rem",fontWeight:"700",color:b.c,marginBottom:"4px"}}>{b.t}</div>
+              <div style={{fontSize:"0.75rem",color:b.tx,lineHeight:"1.55"}}>{b.d}</div>
+            </div>
+          ))}
+        </div>
+      </StepCard>
+
+      <StepCard step="Step 4" title="Evaluate the sample" color={GD}>
+        One trade tells you almost nothing. A set of trades managed the same way tells you a lot. Before you change any rule, sit down with the journal and look across the whole body of results for patterns that repeat.
+        <RuleBox color={GD} rule="Review only after a full sample of trades executed with the same rules. Twenty trades is a reasonable minimum for most styles. Ask: which rule failed repeatedly, and did I follow the plan on the trades that lost?"/>
+        <InfoBox icon="🔍" label="What to look for" bg="#f7f0e6">
+          Losers that were exited late, more than a few times. Winners cut well short of the target, more than a few times. Invalidation levels that were routinely hit and then reversed. A high count in the "broke plan" column. Any of these is a pattern. A single instance of any of them is a Tuesday.
+        </InfoBox>
+      </StepCard>
+
+      <StepCard step="Step 5" title="Change one variable" color={OR}>
+        Once the sample shows a real pattern, adjust exactly one rule in the plan and run the next sample with the change in place. Change two things and you will never know which one worked.
+        <RuleBox color={OR} rule="Change one rule per sample. Write the change and the reason on the planner before the next trade. Run the full sample again before judging it."/>
+        <InfoBox icon="🧮" label="Example" bg="#e8faf3" green>
+          Across twenty swing trades, your trailing stop triggered on ordinary pullbacks eight times, and price went on to hit the target in six of those. The pattern is a trail that is too tight for the daily timeframe. Change: trail below the prior two days' low instead of one. Nothing else changes. Twenty more trades, then evaluate again.
+        </InfoBox>
+      </StepCard>
+
+      <AskYourself
+        color={OR}
+        question="Am I changing this rule because of a pattern in the journal, or because of the trade that just closed?"
+        noLabel="Trade"
+        no="Do not change it. Log the trade, note the urge, and keep executing the current plan until the sample is complete."
+        yesLabel="Pattern"
+        yes="Change that one rule, write the reason down, and carry it into your next Module 5 plan."
+      />
+
+      <PathSwitch current={4} goTab={goTab}/>
+      <Resources items={TOOLS}/>
+      <ChecklistBridge/>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// APP
+// ═══════════════════════════════════════════════════════════════
+const TABS=[
+  {label:"Process",  icon:"🧭"},
+  {label:"Winner",   icon:"📈"},
+  {label:"Loser",    icon:"📉"},
+  {label:"Stay",     icon:"⏸️"},
+  {label:"Execute",  icon:"✅"},
+];
+
+function App(){
+  const[tab,setTab]=useState(0);
+  function goTab(i){ setTab(i); window.scrollTo({top:0,behavior:"smooth"}); }
+
+  return(
+    <div>
+      <div style={{background:DK,padding:"11px 20px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+        <span style={{fontFamily:"Georgia,serif",fontStyle:"italic",fontSize:"1.2rem",color:"#fff"}}>demystified</span>
+        <a href="https://options101-hub.vercel.app/"
+          style={{display:"flex",alignItems:"center",gap:"6px",background:"rgba(255,255,255,0.08)",border:"1px solid rgba(255,255,255,0.14)",borderRadius:"999px",padding:"5px 14px",textDecoration:"none"}}
+          onMouseOver={e=>e.currentTarget.style.background="rgba(255,255,255,0.15)"}
+          onMouseOut={e=>e.currentTarget.style.background="rgba(255,255,255,0.08)"}>
+          <span style={{color:"#d4a87a",fontSize:"0.8rem"}}>←</span>
+          <span style={{fontSize:"0.65rem",fontWeight:"700",letterSpacing:"0.1em",textTransform:"uppercase",color:"#d4a87a"}}>Options 101 Hub</span>
+        </a>
+        <div style={{width:"22px",height:"22px",background:OR,borderRadius:"5px"}}/>
+      </div>
+
+      <div style={{maxWidth:"860px",margin:"0 auto",padding:"22px 16px 40px"}}>
+        <div style={{marginBottom:"14px"}}>
+          <div style={{fontSize:"0.62rem",fontWeight:"700",letterSpacing:"0.14em",textTransform:"uppercase",color:"#8a7560",marginBottom:"6px"}}>Module 6</div>
+          <h1 style={{fontFamily:"Georgia,serif",fontSize:"clamp(1.7rem,4vw,2.3rem)",color:DK,letterSpacing:"-0.03em",lineHeight:"1.15",marginBottom:"4px"}}>Trade Management</h1>
+          <p style={{color:"#8a7560",fontSize:"0.85rem"}}>From fill to exit.</p>
+        </div>
+
+        <div style={{display:"flex",gap:"2px",background:"#e4d8c8",borderRadius:"12px",padding:"3px",marginBottom:"10px"}}>
+          {TABS.map((t,i)=>(
+            <button key={i} onClick={()=>goTab(i)} style={{
+              flex:1,padding:"9px 2px",border:"none",borderRadius:"9px",cursor:"pointer",
+              fontWeight:"700",fontSize:"0.58rem",letterSpacing:"0.01em",transition:"all 0.18s",
+              background:tab===i?"#fff":"transparent",
+              color:tab===i?OR:"#8a7560",
+              boxShadow:tab===i?"0 1px 6px rgba(0,0,0,0.09)":"none",lineHeight:"1.3"}}>
+              <div style={{fontSize:"0.85rem"}}>{t.icon}</div>
+              <div style={{marginTop:"2px"}}>{t.label}</div>
+            </button>
+          ))}
+        </div>
+
+        <div style={{height:"3px",background:"#e4d8c8",borderRadius:"2px",marginBottom:"20px"}}>
+          <div style={{height:"100%",width:((tab/(TABS.length-1))*100)+"%",background:OR,borderRadius:"2px",transition:"width 0.4s ease"}}/>
+        </div>
+
+        {tab===0&&<TabProcess goTab={goTab}/>}
+        {tab===1&&<TabWinner  goTab={goTab}/>}
+        {tab===2&&<TabLoser   goTab={goTab}/>}
+        {tab===3&&<TabStay    goTab={goTab}/>}
+        {tab===4&&<TabExecute goTab={goTab}/>}
+
+        <div style={{marginTop:"24px",textAlign:"center",fontSize:"0.65rem",color:"#b0a090",letterSpacing:"0.05em"}}>
+          <span style={{fontFamily:"Georgia,serif",fontStyle:"italic"}}>demystified</span> · For educational purposes only
+        </div>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
