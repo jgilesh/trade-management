@@ -374,7 +374,7 @@ const WINNER_CARDS = [
     what:"A profit target is a predefined condition at which the plan calls for exiting some or all of the position. Depending on the trader's approach, that condition might be based on price, chart structure, contract value, or another defined measure.",
     why:"A target turns 'I am up' into a decision. Without one, gains float until a red candle forces a panicked choice. With one, the exit is a fill, not a feeling.",
     analogy:"A road trip with a destination typed into the map. You might stop early for a reason, but you always know exactly where the drive was supposed to end.",
-    rule:"Set the target before entry and write it on the planner. When the predefined condition occurs, follow the response written in your plan.",
+    rule:"Set the target before entry and write it on the planner. When price reaches it, execute. When the predefined condition occurs, follow the response written in your plan.",
     example:"Stock at $50, resistance at $54. You buy a call at $1.30 and set the target at $2.60, a 100% gain on premium. Stock runs to $54.10, contract prints $2.65. You exit at $2.60 as planned: $130 profit per contract. Whatever the stock does next is not your trade anymore.",
     green:["Target sits at a real chart level: resistance, a prior high, a measured move","Target was written down before the entry","Target gives the trade a favorable reward compared to the invalidation distance"],
     red:["Target is 'as much as I can get'","Target moved higher after price got close to it","Target was chosen after entry because the trade started working"]
@@ -522,7 +522,7 @@ const LOSER_CARDS = [
     what:"Logging a loser means recording the thesis, the invalidation level, where you actually exited, and whether you honored the plan. It also means recording how it felt, in one line.",
     why:"Losers carry the most information about your process. Did the invalidation level make sense? Was the thesis weak from the start? Did you honor the exit? None of those questions can be answered without a record.",
     analogy:"An incident report after a near miss at work. Nobody enjoys writing it, and it is the only reason the next one gets prevented.",
-    rule:"Log the losing trade the same day, before you look for the next setup. Write down whether you followed the plan, separate from whether you lost money.",
+    rule:"When the predefined invalidation condition occurs, execute the planned response. Do not change the timeframe or move the invalidation condition farther away to keep the trade alive.",
     example:"Entry $1.30, thesis: support bounce at $49. Invalidation: close below $48.50. Exit: $0.70, honored. Loss $60 per contract. Note: 'Followed plan. Loss was the cost of finding out.' That is a good trade that lost money, and the journal knows the difference."
   },
 ];
