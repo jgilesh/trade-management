@@ -248,7 +248,7 @@ function ChecklistBridge(){
       <div style={{flex:1,minWidth:"200px"}}>
         <div style={{fontSize:"0.65rem",fontWeight:"700",letterSpacing:"0.15em",textTransform:"uppercase",color:"#9a7a55",marginBottom:"5px"}}>The loop closes where it began</div>
         <div style={{fontFamily:"Georgia,serif",fontSize:"1rem",color:"#fff",marginBottom:"5px"}}>Your next trade starts with the Pre-Trade Checklist and a written plan.</div>
-        <div style={{fontSize:"0.78rem",color:"#d4a87a",lineHeight:"1.55"}}>Carry the one variable you changed into the next plan. Then manage that trade exactly the way this module describes.</div>
+        <div style={{fontSize:"0.78rem",color:"#d4a87a",lineHeight:"1.55"}}>Carry any change you're testing into the next plan. Then manage the trade according to that plan.</div>
       </div>
       <div style={{display:"flex",gap:"8px",flexWrap:"wrap",flexShrink:0}}>
         <a href={LINK.checklist} target="_blank" rel="noopener noreferrer"
@@ -275,44 +275,44 @@ const PROCESS_CARDS = [
     why:"Without the plan, every candle becomes a new decision. With it, price movement is just information that maps to a response you already chose.",
     analogy:"A pilot flying a route does not decide where to go each time the wind shifts. The flight plan is filed before takeoff. In the air, the job is to compare position to plan and make the corrections the plan already allows for.",
     rule:"Manage the live trade against the written plan. Ask: what is price doing relative to the conditions I defined before entry?",
-    example:"Stock at $50. You bought a call for $1.30 with a target at $54, invalidation below $48.50. Stock is now $51.20. Compare: target not hit, invalidation not hit. The plan says nothing has happened yet, so nothing needs to be done."
+    example:"Your plan says to take profit if the stock reaches $54 and exit if it closes below $48.50. The stock is now $51.20. Neither condition has occurred, so there is nothing to execute. Continue managing the trade according to the plan."
   },
   {
     id:"conditions", icon:"🚦", color:GR, title:"Hold / exit conditions",
-    short:"Once you're in the trade, price can be sorted into three management paths: a profit‑management condition has occurred, an invalidation condition has occurred, or neither has occurred.",
-    what:"Before entry, the plan defined a profit‑management condition and an invalidation condition. Everything else is a hold. That gives price exactly three places to be: winner condition met, loser condition met, or neither.",
-    why:"Three states is a manageable number of decisions. Three hundred candles is not. Sorting price into one of the three states is what stops a live trade from feeling like chaos.",
+    short:"Sort the live trade into one of three management paths.",
+    what:"Before entry, your plan defined the conditions that would cause you to manage a winner or exit a loser. If neither condition has occurred, you hold. That gives every live trade one of three management paths: Winner, Loser, or Hold.",
+    why:"Without predefined conditions, every price move can feel like a new decision. Sorting the trade into one of three management paths keeps you responding to the plan instead of reacting to every candle.",
     analogy:"A thermostat has a target and a tolerance. Above the range, the AC turns on. Below, the heat turns on. Inside the range, it does nothing, and it is not confused about doing nothing.",
-    rule:"Identify which condition is occurring before you act: winner, loser, or hold. If no predefined condition has occurred, there is nothing new to execute.",
-    example:"Plan: exit half the position when the contract reaches $2.60, exit all if the stock closes below $48.50. Contract is at $1.90 and stock at $51.80. State: hold. Contract hits $2.60: state changes to winner and the scale‑out executes."
+    rule:"Identify which management path applies before you act: Winner, Loser, or Hold. If no predefined condition has occurred, there is nothing to execute.",
+    example:"Your plan says to take partial profit if the stock reaches $54 and exit if it closes below $48.50. The stock is at $51.80. Neither condition has occurred, so you hold. Later, the stock reaches $54. A profit‑management condition has now occurred, so you move to Manage a Winner."
   },
   {
     id:"consistent", icon:"🔁", color:BL, title:"Consistent execution",
     short:"Do the same thing every time, so the results can teach you something.",
-    what:"Consistency means responding to the same condition the same way, trade after trade, even when a given trade tempts you to do otherwise.",
-    why:"A single trade can win for the wrong reason or lose for the right one. Only a consistent process produces results you can actually evaluate. Inconsistent execution makes every result noise.",
+    what:"Consistency means responding to the same condition the same way, trade after trade—even when a particular trade tempts you to do otherwise.",
+    why:"A single trade can win for the wrong reason or lose for the right one. Only a consistent process produces results you can meaningfully evaluate. Inconsistent execution makes every result harder to interpret.",
     analogy:"A recipe tested with a different oven temperature every time never tells you whether the recipe works. Hold the temperature steady, and the results start to mean something.",
-    rule:"Execute the same management rules consistently across a sample of trades. Evaluate the process after you have enough comparable results to identify a pattern.",
-    example:"Ten swing trades, all planned with the same invalidation rule. On trade four you widen the stop because you have a feeling. The trade recovers and wins. You now have nine data points, not ten, and a bad habit with a reward attached to it."
+    rule:"Execute the management conditions in your plan consistently from trade to trade. Don't change the rule because of what happened on the last trade.",
+    example:"Your plan says to exit when the stock closes below your invalidation level. On one trade, that condition occurs—but you decide to wait another day. The stock recovers. You made money, but you did not follow the process. Record the deviation rather than treating the outcome as evidence that waiting works."
   },
   {
     id:"journal", icon:"📓", color:PU, title:"Trade journaling",
     short:"A record turns individual trades into usable data.",
-    what:"The Trade Journal captures the numbers of the trade and gives you space to record useful information about the trade: your goals, rules, strategies, and thoughts. That record connects what happened in this trade to what you can learn from it.",
+    what:"The Trade Journal records what happened in the trade and gives you space to capture useful information about how you managed it: your plan, execution, result, and observations. That record connects what happened in this trade to what you can learn from it.",
     why:"A journal gives you a record of what actually happened so you can review your trading process over time rather than relying on memory.",
     analogy:"A fitness log. Nobody remembers what they lifted six weeks ago, but the log does. Over time, that record makes patterns visible.",
-    rule:"Record the trade in your Trade Journal, including the numbers and the information that will help you evaluate your process later.",
-    example:"You close an options trade for a profit. In the Trade Journal, you record the trade details and result. In Notes, you add: 'Target was not reached. I exited early when price pulled back because I was nervous about giving back profit.' That note gives you something to evaluate later: not just what happened, but how you managed it.",
+    rule:"Record the trade in your Trade Journal, including the result and the information you'll need to evaluate your management process later.",
+    example:"Your target was not reached, but you exited early when price pulled back because you were nervous about giving back profit. Record the exit and note why you made it. Later, you can evaluate not only the result, but whether you followed your plan.",
     link:{label:"📓 Open Dominique's Trading Journal",url:LINK.journal}
   },
   {
     id:"data", icon:"📊", color:GD, title:"Data before adjustment",
     short:"Look for patterns before you change the process.",
-    what:"Your Trade Journal gives you a record you can review across multiple trades. Instead of changing your approach because of one outcome, look across your journal for patterns in your results, execution, rules, strategies, and notes.",
-    why:"One trade can make a good process look bad, or a poor decision look brilliant. Reviewing a body of journaled trades gives you more information to work with before deciding whether something in your process needs to change.",
+    what:"Your Trade Journal gives you a body of trades you can review for patterns. Instead of changing your process because of one outcome, look across multiple comparable trades to see what repeatedly happens.",
+    why:"One trade can make a good process look bad—or a poor decision look brilliant. A body of consistently managed, journaled trades gives you better evidence for deciding whether something in your process needs to change.",
     analogy:"Testing a recipe once and deciding it needs less flour. Maybe it does, or maybe your oven was too hot. Repeat the process consistently first, then look for the pattern.",
-    rule:"Before changing your trade‑management process, review a body of journaled trades and identify the pattern you're trying to improve.",
-    example:"You notice one trade would have made more money if you had held longer. That alone doesn't tell you to change your exit. After reviewing a series of trades, however, you notice that you repeatedly exit before your planned target even though your original trade thesis remains valid. Now you have a pattern worth investigating."
+    rule:"Before changing your trade‑management process, review a body of comparable, journaled trades and identify the pattern you're trying to improve.",
+    example:"One trade would have made more money if you had held longer. That's one outcome—not a reason to change your process. After reviewing a series of comparable trades, you notice that your planned exits repeatedly cut profitable moves short. Now you have a pattern worth investigating."
   },
 ];
 
@@ -323,7 +323,7 @@ function TabProcess({goTab}){
       <QDA
         question="What is price doing relative to my plan?"
         options={["Winner","Loser","Hold"]}
-        action="The decisions were made in Module 5. Your job now is to observe price, identify which predefined condition is occurring, and respond exactly the way the plan says. Then record it."
+        action={<span>The decisions were made in <a href={LINK.planning} target="_blank" rel="noopener noreferrer" style={{color:"#d4a87a",textDecoration:"underline"}}>Module 5</a>. Your job now is to observe price, identify which predefined condition is occurring, and manage the position according to your plan. Then record what happened.</span>}
         color={OR}
       />
 
@@ -343,7 +343,7 @@ function TabProcess({goTab}){
         ))}
       </div>
 
-      <InfoCard icon="🧭" title="Why this module is a field guide, not a course" color={OR}>
+      <InfoCard icon="🧭" title="Why this module works like a field guide" color={OR}>
         You will not move through these paths once, in order. You will come back to whichever one matches the trade in front of you, sometimes several times in a single position. A swing trade might sit in Stay With the Trade for a week, jump to Manage a Winner for a scale‑out, then return to Stay. That is normal. The tabs are places to stand, not steps to finish.
       </InfoCard>
 
@@ -370,47 +370,47 @@ function TabProcess({goTab}){
 const WINNER_CARDS = [
   {
     id:"target", icon:"🎯", color:GR, title:"Profit targets",
-    short:"A predefined price or premium where you exit some or all of the position.",
-    what:"A profit target is a predefined condition at which the plan calls for exiting some or all of the position. Depending on the trader's approach, that condition might be based on price, chart structure, contract value, or another defined measure.",
-    why:"A target turns 'I am up' into a decision. Without one, gains float until a red candle forces a panicked choice. With one, the exit is a fill, not a feeling.",
+    short:"A predefined condition for taking profit on some or all of the position.",
+    what:"A profit target is a predefined condition at which the plan calls for exiting some or all of the position. The condition might be based on stock price, chart structure, contract value, or another defined measure.",
+    why:"A profit target defines in advance what favorable movement you are trying to capture and what you will do when it occurs. Instead of deciding what is “enough” while the trade is moving, you execute the response already written in your plan.",
     analogy:"A road trip with a destination typed into the map. You might stop early for a reason, but you always know exactly where the drive was supposed to end.",
-    rule:"Set the target before entry and write it on the planner. When price reaches it, execute. When the predefined condition occurs, follow the response written in your plan.",
-    example:"Stock at $50, resistance at $54. You buy a call at $1.30 and set the target at $2.60, a 100% gain on premium. Stock runs to $54.10, contract prints $2.65. You exit at $2.60 as planned: $130 profit per contract. Whatever the stock does next is not your trade anymore.",
-    green:["Target sits at a real chart level: resistance, a prior high, a measured move","Target was written down before the entry","Target gives the trade a favorable reward compared to the invalidation distance"],
-    red:["Target is 'as much as I can get'","Target moved higher after price got close to it","Target was chosen after entry because the trade started working"]
+    rule:"Define the target condition and response before entry and write them on the planner. When the condition occurs, execute the planned response.",
+    example:"You buy a call while the stock is at $50. Your plan says: if the stock reaches $54 resistance, exit the position. The stock reaches $54. The profit‑management condition has occurred, so you execute the planned exit.",
+    green:["Target condition is clearly defined before entry","Target is based on the trade plan, not a desired dollar gain","The planned response is clear: how much of the position to exit"],
+    red:["Target is simply “as much as I can get”","Target is moved because price gets close to it","Target is chosen after entry because the trade starts working"]
   },
   {
     id:"scale", icon:"🪜", color:GR, title:"Scaling out",
     short:"Exit part of the position at one level and let the rest keep working.",
-    what:"Scaling out means closing a portion of the contracts at a predefined level, then managing the remainder with a different rule, often a trailing stop or a second target.",
-    why:"It allows a trader to realize gains on part of a position while keeping another portion exposed to additional movement. Part of the trade is finished and paid. The rest can pursue a bigger move with less pressure on you.",
+    what:"Scaling out means closing a part of a position when a predefined condition occurs, then continuing to manage the remaining position according to the plan.",
+    why:"Scaling out allows a trader to realize gains on part of a position while keeping the remainder open for additional movement. Both the partial exit and the management of the remaining position are planned in advance.",
     analogy:"Harvesting a garden in stages. Pick what is ripe today, leave the rest on the vine to grow. You eat well now and still have a crop coming.",
-    rule:"Decide the split and the levels before entry, for example half at the first target, half trailed. Never scale out because you feel nervous. Scale out because the level printed.",
-    example:"You hold 4 contracts bought at $1.30, total cost $520. Plan: exit 2 at $2.00, trail the other 2. Contract hits $2.00, you exit 2 for $400. Your remaining 2 contracts cost $260, and you have already taken $400 out. The rest of the trade is playing with house money, by design rather than by luck.",
-    green:["Split and levels are on the planner","The remaining contracts have their own management rule","Position size was large enough to divide (4 contracts, not 1)"],
-    red:["Selling one contract 'just to feel better'","No rule for what happens to the remainder","Scaling out of a 1‑contract position, which is just exiting"]
+    rule:"Define before entry how much of the position you will exit, the condition that triggers the partial exit, and how you will manage what remains. Scale out because the planned condition occurred, not because the open profit changed how you feel.",
+    example:"You buy four call contracts. Your plan says: when the stock reaches the first target, exit two contracts and manage the remaining two using your trailing condition. The stock reaches the first target. You exit two contracts and continue managing the other two according to plan.",
+    green:["Position can be divided into the planned portions","Partial‑exit condition and amount are defined before entry","The remaining position has its own management condition"],
+    red:["Exiting part of the position simply because you feel nervous","No predefined condition for the partial exit","No plan for managing the remaining position"]
   },
   {
     id:"trail", icon:"🪢", color:GR, title:"Trailing mechanisms",
-    short:"An exit that follows price higher and only triggers when price pulls back a set amount.",
-    what:"A trailing mechanism is a moving exit condition. As the stock rises, the exit level rises with it. When the predefined trailing condition occurs, the plan calls for an exit. Common versions: a fixed dollar amount below the high, a moving average, or the low of the prior candle on your timeframe.",
-    why:"A trailing mechanism allows the exit condition to move with favorable price movement rather than requiring a fixed profit target. The trade remains open until the predefined trailing condition occurs.",
+    short:"An exit condition that adjusts as favorable price movement develops.",
+    what:"A trailing mechanism is an exit condition that adjusts as price moves favorably. Rather than using one fixed profit target, the plan defines what the exit condition will follow and what will trigger the exit. Examples include a fixed distance from the high, a moving average, or the prior candle's low on the planned timeframe.",
+    why:"A trailing mechanism allows the exit condition to adjust with favorable price movement rather than requiring a fixed profit target. The position remains open until the predefined trailing condition occurs.",
     analogy:"A dog on a retractable leash. It can run as far as it wants in the open field, but the moment it turns back toward you past a certain point, the leash locks.",
-    rule:"Choose the trailing method and exit condition before entry, using the timeframe your plan was built on. Adjust the trailing condition only in the direction of the trade, never against it.",
-    example:"Swing call bought at $1.30 with the stock at $50. Trailing rule: exit if the stock closes below the prior day's low. Stock climbs $51, $52.50, $53.80 over four days. Day five closes at $52.90, below day four's low of $53.10. You exit the contract around $2.30, roughly $100 profit per contract, and the trail did its job.",
-    green:["Trailing method fits the planned timeframe","The trail is checked on the planned timeframe, not a faster one","Exit level only ever moves up"],
-    red:["Trail set so tight that ordinary wiggle stops you out","Moving the trail lower to 'give it room' after a red candle","Switching to a 5‑minute chart to manage a daily‑chart trade"]
+    rule:"Define the trailing method, exit condition, and timeframe before entry. Adjust the trailing condition only as described by the plan; do not loosen it to keep the trade open.",
+    example:"Your plan says: after the stock begins moving favorably, manage the position using the prior daily candle's low. Each day that price advances, the reference level updates. When the stock closes below the prior day's low, the trailing condition has occurred and you execute the planned exit.",
+    green:["Trailing method and timeframe are defined before entry","The trail adjusts according to predefined rule","Exit occurs when the predefined trailing condition is met"],
+    red:["Trail is tightened simply because you are afraid of giving back profit","Trail is loosened to keep the trade open","You switch to a different timeframe after entry to avoid the exit"]
   },
   {
     id:"structure", icon:"📐", color:GR, title:"Price structure and trendlines",
-    short:"Let the chart's own levels tell you where the move is intact and where it is not.",
-    what:"Structure‑based management uses the levels from Technical Analysis, such as trendlines, higher lows, and prior resistance turned support, as the reference for staying in or taking gains. The move is 'working' while structure holds.",
-    why:"Structure is objective and visible. It gives a winner a reason to stay open that is not 'I hope it goes higher' and a reason to exit that is not 'I got scared.'",
+    short:"Use predefined chart structure to determine whether favorable movement remains intact.",
+    what:"Structure‑based management uses predefined chart features—such as higher lows, trendlines, or prior resistance turned support—to manage an open position. The plan identifies the structure to observe and the change in that structure that will trigger a response.",
+    why:"Price structure provides an observable reference for managing favorable movement without requiring a fixed profit target. The decision remains tied to the chart condition defined in the plan rather than to the size of the open gain.",
     analogy:"Climbing a staircase in the dark. As long as each step is where you expect it, you keep going. The moment your foot finds no step, you stop.",
-    rule:"Define the chart structure you will use to manage the position and what change in that structure will trigger a response. Then evaluate the live chart against that predefined condition.",
-    example:"Stock at $50 breaks out above $49.50 resistance and makes higher lows at $50.40 and $51.60. Your call runs from $1.30 to $2.40. Price then closes below the $51.60 higher low. Structure is broken. You exit at $2.10, still a $80 per‑contract gain, and the chart, not your nerves, made the call.",
-    green:["Higher lows continue on the planned timeframe","Pullbacks hold above the trendline or prior resistance","Volume supports the move (see the Technical Analysis module)"],
-    red:["A close below the most recent higher low","Trendline broken and retested from below","You redrew the trendline so the trade still 'works'"]
+    rule:"Define before entry the chart structure you will use to manage the position, what change in that structure will trigger a response, and the timeframe on which you will evaluate it. Then compare the live chart with that predefined condition.",
+    example:"Your plan says to remain in the trade while the stock continues making higher lows on the daily chart and to exit if price closes below the most recent confirmed higher low. Price continues making higher lows, so you hold. Later, a daily candle closes below the most recent confirmed higher low. The condition has occurred, so you execute the planned exit.",
+    green:["The structure being monitored is defined in the plan","Structure is evaluated on the planned timeframe","The response to a break in structure is defined in advance"],
+    red:["You change which chart feature matters after entry","You redraw a level so the trade still “works”","You switch timeframes to avoid acting on the planned condition"]
   },
 ];
 
@@ -421,17 +421,17 @@ function TabWinner({goTab}){
       <QDA
         question="Price is moving my way. Has a profit‑management condition from my plan occurred?"
         options={["Yes → Execute it","Not yet → Hold"]}
-        action="Look at the planner, not the P/L. If a predefined profit‑management condition has occurred, execute the planned response. If not, this is still a hold. Go to Stay With the Trade."
+        action="Look at the planner, not the P/L. If a predefined profit‑management condition has occurred, execute the planned response. If not, hold and continue managing according to plan."
         color={GR}
       />
 
-      <InfoCard icon="🧩" title="There is no single correct exit" color={GR}>
+      <InfoCard icon="🧩" title="There is no single correct way to manage a winner" color={GR}>
         These four mechanisms are tools, not a ranking. A scalper and a LEAP holder will not manage a winner the same way, and neither of them is wrong. What matters is understanding how each mechanism works, choosing an approach as part of your trade plan, and executing it consistently enough to evaluate the results.
         <div style={{marginTop:"8px"}}>If the profit‑management condition defined in your plan has not occurred, there is nothing to execute yet. Continue managing the position according to the plan.</div>
       </InfoCard>
 
       <div style={{marginTop:"18px"}}>
-        <SectionLabel label="Profit‑management mechanisms" sub="Four ways to manage favorable movement. Each protects gains while letting the trade keep working. Tap to expand." color={GR}/>
+        <SectionLabel label="Profit‑management mechanisms" sub="Four mechanisms for managing favorable price movement. Each defines a condition and a planned response. Tap to expand." color={GR}/>
         {WINNER_CARDS.map(c=>(
           <ExpandableCard key={c.id} accent={c.color} icon={c.icon} title={c.title} shortDesc={c.short}
             isOpen={open===c.id} onToggle={()=>setOpen(open===c.id?null:c.id)}>
@@ -444,21 +444,21 @@ function TabWinner({goTab}){
       <div style={{marginTop:"18px",background:CA,border:"1px solid "+BD,borderRadius:"14px",overflow:"hidden"}}>
         <div style={{background:"#f0e8da",padding:"12px 16px",borderBottom:"1px solid "+BD}}>
           <div style={{fontWeight:"700",fontSize:"0.82rem",color:DK}}>📋 Understanding the mechanisms</div>
-          <div style={{fontSize:"0.72rem",color:"#8a7560",marginTop:"2px"}}>Each manages favorable movement differently. Understand what each one does and what must be defined in your plan.</div>
+          <div style={{fontSize:"0.72rem",color:"#8a7560",marginTop:"2px"}}>Each manages favorable movement differently. Compare what each does and what must be defined in your plan.</div>
         </div>
         <div style={{overflowX:"auto"}}>
           <table style={{width:"100%",borderCollapse:"collapse",minWidth:"560px"}}>
             <thead><tr style={{background:"#faf6ef"}}>
-              {["Mechanism","What it does","What it gives you","Define in your plan"].map(h=>(
+              {["Mechanism","What it does","Define in your plan"].map(h=>(
                 <th key={h} style={{textAlign:"left",padding:"10px 14px",fontSize:"0.62rem",fontWeight:"700",letterSpacing:"0.1em",textTransform:"uppercase",color:"#8a7560",borderBottom:"1px solid "+BD}}>{h}</th>
               ))}
             </tr></thead>
             <tbody>
               {[
-                ["Profit target","Exit some or all when a predefined condition occurs","Establishes a defined point for taking profit","Target condition + response"],
-                ["Scaling out","Exit portions of the position at predefined conditions","Realize gains while keeping part of the position open","Position split + conditions for each"],
-                ["Trailing mechanism","Exit condition adjusts as price moves favorably","Allows continued participation until the trailing condition occurs","Method + exit condition + timeframe"],
-                ["Price structure","Manage against predefined chart structure","Keeps management anchored to observable price behavior","Structure to observe + condition that changes the response"],
+                ["Profit target","Exits some or all when a predefined condition occurs","Target condition + response"],
+                ["Scaling out","Exits portions of the position as predefined conditions occur","Position split + condition and response for each portion"],
+                ["Trailing mechanism","Adjusts the exit condition as price moves favorably","Trailing method + exit condition + timeframe"],
+                ["Price structure","Manages the position using predefined chart structure","Structure to observe + condition that triggers a response + timeframe"],
               ].map((r,i)=>(
                 <tr key={i} style={{borderBottom:"1px solid "+BD}}>
                   {r.map((c,j)=>(<td key={j} style={{padding:"10px 14px",fontSize:"0.76rem",color:j===0?DK:"#5a4535",fontWeight:j===0?"700":"400",lineHeight:"1.5"}}>{c}</td>))}
@@ -482,19 +482,19 @@ function TabWinner({goTab}){
 const LOSER_CARDS = [
   {
     id:"normal", icon:"🌊", color:RD, title:"Normal adverse movement",
-    short:"Price going against you for a while is part of almost every winning trade.",
-    what:"Adverse movement is price moving against your position without triggering the invalidation condition defined in your plan. Pullbacks, countertrend candles, and consolidation can all occur while a trade thesis remains intact. Adverse movement alone is not an exit signal.",
+    short:"Price can move against your position without invalidating the trade.",
+    what:"Adverse movement is price moving against your position without triggering the invalidation condition defined in your plan. Pullbacks, countertrend candles, and consolidation can all occur without triggering that condition. Adverse movement alone is not an exit signal.",
     why:"If every move against you becomes a reason to exit, your live P/L starts managing the trade instead of your plan. A predefined invalidation condition gives you something objective to compare against while the position is live.",
-    analogy:"Turbulence on a flight. It is uncomfortable, it is expected, and it is not the same thing as the plane going down. The pilot does not divert for turbulence.",
+    analogy:"Turbulence on a flight. It can be uncomfortable without changing the destination. The flight continues unless something occurs that calls for a different response.",
     rule:"If your predefined invalidation condition has not occurred, continue managing according to plan. Evaluate the trade on the timeframe your plan specifies, not according to the color of the candle or your P/L.",
-    example:"Stock at $50, call bought at $1.30, invalidation set at a close below $48.50. Stock pulls back to $49.20 and your contract drops to $0.95. Painful, but $49.20 is above $48.50. The plan says hold. Three days later the stock is at $52.40 and the contract is $2.10."
+    example:"Your plan says to exit if the stock closes below $48.50 on the daily chart. During the trade, price falls to $49.20. The stock is moving against you, but the invalidation condition has not occurred. Continue managing according to plan."
   },
   {
     id:"thesis", icon:"🔍", color:RD, title:"Compare price to the plan",
     short:"Your live P/L doesn't determine whether the trade is valid. Your predefined condition does.",
     what:"Before entry, your trade thesis was translated into a specific invalidation condition in your plan. While the position is live, compare what price is doing with that condition rather than rebuilding the analysis.",
     why:"Re‑analyzing the trade every time price moves against you creates new decisions under pressure. The plan gives you a consistent standard: either the invalidation condition has occurred or it has not.",
-    analogy:"You planted tomatoes because the forecast said sun. A cloudy afternoon does not change the forecast. A week of frost does. Check the forecast, not the sky outside the window right now.",
+    analogy:"A measuring line marked before the game begins. You don't redraw the line because you dislike what the measurement shows. You compare what happened with the standard you already set.",
     rule:"Do not invent a new test while the trade is live. Return to the invalidation condition defined before entry and evaluate it on the planned timeframe.",
     example:"Your plan says the trade is invalidated by a daily close below $49 support. Price trades below $49 during the day but closes at $49.40. The predefined condition has not occurred. Continue managing according to plan."
   },
@@ -503,27 +503,27 @@ const LOSER_CARDS = [
     short:"The condition that tells you the original trade thesis is no longer intact.",
     what:"Invalidation is the specific price or chart condition defined before entry that tells you the original trade thesis is no longer intact. The condition and timeframe come from the setup and are recorded in the trade plan.",
     why:"Defining invalidation before entry separates analysis from execution. Instead of deciding what a losing trade means while money and emotion are involved, you have already defined the chart condition that requires action.",
-    analogy:"A fire escape plan drawn up on a normal Tuesday. Nobody designs a good exit route while the smoke alarm is going off. You follow the one that was drawn when you could think.",
-    rule:"Define the invalidation condition before entry and manage it according to the plan. Do not move it farther away simply to keep a losing trade alive.",
-    example:"Stock at $50, call at $1.30, invalidation is a daily close below $48.50. The stock closes at $48.30. Your contract is worth $0.70. The plan says exit. Loss: $60 per contract instead of the full $130. That $70 difference, repeated across dozens of trades, is how accounts survive."
+    analogy:"A fire escape plan made before the alarm goes off. You decide how to get out while you can think clearly—not once the room is filling with smoke.",
+    rule:"Define the invalidation condition before entry and manage the trade against it on the planned timeframe. Do not move the condition farther away simply to keep a losing trade alive.",
+    example:"Your plan says to exit if the stock closes below $48.50 on the daily chart. The stock closes at $48.30. The invalidation condition has occurred. Execute the planned exit."
   },
   {
     id:"honor", icon:"🤝", color:RD, title:"Honor the exit",
-    short:"When the invalidation condition occurs, the trade is already over. Your job is the click.",
+    short:"When the invalidation condition occurs, the decision has already been made. Your job is to execute it.",
     what:"Honoring the exit means executing the response defined in your plan when the invalidation condition actually occurs, without changing the condition because you dislike the outcome.",
     why:"Consistent execution is what makes your results useful. If you honor invalidation on some trades and override it on others, you cannot tell whether the rule itself works.",
-    analogy:"The smoke alarm goes off and you leave the building. You do not stay to see whether it is a real fire. The alarm was the decision. Leaving is just the follow‑through.",
+    analogy:"A decision made in advance and put on the calendar. When the time comes, you don't reopen the decision—you carry it out.",
     rule:"When the predefined invalidation condition occurs, execute the planned response. Do not change the timeframe, move the invalidation farther away, or add a new reason to remain in the trade.",
-    example:"Invalidation was a daily close below $48.50. The daily candle closes at $48.30. You feel the urge to check the weekly chart, where it still 'looks fine.' The plan was written on the daily. You exit at $0.70. The next day the stock opens at $47.10 and the contract is $0.35."
+    example:"Your invalidation condition is a daily close below $48.50. The daily candle closes at $48.30. You feel the urge to check the weekly chart, where the trade still “looks fine.” But your plan was built on the daily timeframe. The condition has occurred, so you execute the planned exit."
   },
   {
     id:"log", icon:"📓", color:RD, title:"Log the outcome",
-    short:"A loss that is journaled is data. A loss that is not is just damage.",
-    what:"Logging a loser means recording the thesis, the invalidation level, where you actually exited, and whether you honored the plan. It also means recording how it felt, in one line.",
-    why:"Losers carry the most information about your process. Did the invalidation level make sense? Was the thesis weak from the start? Did you honor the exit? None of those questions can be answered without a record.",
-    analogy:"An incident report after a near miss at work. Nobody enjoys writing it, and it is the only reason the next one gets prevented.",
-    rule:"When the predefined invalidation condition occurs, execute the planned response. Do not change the timeframe or move the invalidation condition farther away to keep the trade alive.",
-    example:"Entry $1.30, thesis: support bounce at $49. Invalidation: close below $48.50. Exit: $0.70, honored. Loss $60 per contract. Note: 'Followed plan. Loss was the cost of finding out.' That is a good trade that lost money, and the journal knows the difference."
+    short:"Record what happened so the trade can become part of your evidence.",
+    what:"Logging a loser means recording the trade, the planned invalidation condition, where you exited, and whether you followed the plan. Include any observation that may help you evaluate your process later.",
+    why:"A losing trade can tell you something about both your plan and your execution. Was the invalidation condition appropriate? Did you follow it as written? A journal preserves the information you will need to look for patterns across a sample of trades.",
+    analogy:"A lab notebook. One result does not prove much by itself. Record it accurately, and over time the results can reveal a pattern.",
+    rule:"Record what was planned, what occurred, what you did, and the result. Evaluate the trade as part of a larger sample rather than rewriting the process because of one loss.",
+    example:"Plan: exit on a daily close below $48.50. Result: condition occurred; exited according to plan. In your journal, record the exit, the result, and that you followed the planned response. That record can later be reviewed alongside comparable trades."
   },
 ];
 
@@ -534,21 +534,21 @@ function TabLoser({goTab}){
       <QDA
         question="Price is moving against me. Has my predefined invalidation condition occurred?"
         options={["Yes → Exit the trade","No → Hold"]}
-        action="Check the chart against the invalidation level written on your planner, on the timeframe the plan specified. If the condition has occurred, exit now. If it has not, this is ordinary adverse movement and you hold. Being red is not a condition."
+        action="Check the chart against the invalidation condition written on your planner, on the timeframe your plan specifies. If the condition has occurred, execute the planned exit. If it has not, continue managing according to plan. Being red is not an invalidation condition."
         color={RD}
       />
 
       <AskYourself
         color={RD}
-        question="Has the chart done the specific thing that would prove my entry thesis wrong?"
+        question="Has the invalidation condition in my plan occurred?"
         noLabel="No"
-        no="This is adverse movement, not invalidation. Continue managing according to plan. Go to Stay With the Trade."
+        no="The invalidation condition has not occurred. Continue managing according to plan."
         yesLabel="Yes"
         yes="The invalidation condition has occurred. Execute the exit defined in your plan. Then log it, including whether you honored the plan."
       />
 
       <div style={{marginTop:"18px"}}>
-        <SectionLabel label="From red candle to honored exit" sub="How to tell noise from invalidation, and what to do once you know. Tap to expand." color={RD}/>
+        <SectionLabel label="From adverse movement to invalidation" sub="How to distinguish ordinary movement from a predefined exit condition—and what to do when it occurs. Tap to expand." color={RD}/>
         {LOSER_CARDS.map(c=>(
           <ExpandableCard key={c.id} accent={c.color} icon={c.icon} title={c.title} shortDesc={c.short}
             isOpen={open===c.id} onToggle={()=>setOpen(open===c.id?null:c.id)}>
@@ -558,27 +558,27 @@ function TabLoser({goTab}){
       </div>
 
       <div style={{marginTop:"18px"}}>
-        <SectionLabel label="Still valid, or invalidated?" sub="A quick reference for the moment you are staring at a red position." color={RD}/>
+        <SectionLabel label="Still valid, or invalidated?" sub="A quick reference for evaluating a trade that is moving against you." color={RD}/>
         <GreenRed
-          greenLabel="Thesis still valid — hold"
-          redLabel="Thesis invalidated — exit"
+          greenLabel="Invalidation condition has not occurred — hold"
+          redLabel="Invalidation condition has occurred — exit"
           green={[
-            "Stock is red but still above the invalidation level",
-            "Support or trendline from the thesis is holding on the planned timeframe",
-            "The move against you is on lighter volume than the move that got you in",
-            "Nothing on the chart has changed except the P/L"
+            "Check the condition written in your plan.",
+            "Check it on the planned timeframe.",
+            "If the condition has not occurred, continue managing according to plan.",
+            "Do not let your P/L create a new exit condition."
           ]}
           red={[
-            "A close below the invalidation level on the planned timeframe",
-            "The support or trendline the thesis was built on has failed",
-            "You are looking for reasons to stay rather than checking a level",
-            "You are considering adding contracts to lower your average"
+            "The predefined condition has occurred on the planned timeframe.",
+            "Execute the response written in your plan.",
+            "Do not change the timeframe or move the condition farther away.",
+            "Record what happened in your Trade Journal."
           ]}
         />
       </div>
 
       <InfoCard icon="🛡️" title="A note on size" color={GD}>
-        How much a single loser is allowed to cost you is a position‑sizing decision, and it belongs in the Risk Management module (coming soon). This module assumes that decision was already made in Module 5. If a red trade feels unbearable to hold above invalidation, the problem is usually the size, not the plan.
+        How much a single loser is allowed to cost you is a position‑sizing decision, and it belongs in the Risk Management module (coming soon). This module assumes that decision was already made in Module 5. If normal adverse movement feels difficult to tolerate within the planned risk, position size is one factor to review as part of your risk‑management process.
       </InfoCard>
 
       <PathSwitch current={2} goTab={goTab}/>
@@ -594,21 +594,21 @@ function TabLoser({goTab}){
 const STAY_CARDS = [
   {
     id:"none", icon:"🟰", color:BL, title:"No condition triggered",
-    short:"Most of the life of a trade is spent here. Get comfortable.",
-    what:"The hold state is any moment when neither the profit‑management condition nor the invalidation condition has occurred. On a swing trade, this is most days. On a LEAP, it is most months.",
-    why:"Traders lose more money by acting in the hold state than in either of the other two. Every unplanned action here, early exits, adding, tightening, is a decision the plan never asked for.",
+    short:"Most of the life of a trade is spent here. Learn to let the plan work.",
+    what:"The hold state is any moment when neither the profit‑management condition nor the invalidation condition has occurred.",
+    why:"Acting when no condition has occurred introduces a decision the plan never asked you to make. Holding preserves the process you defined before the trade began.",
     analogy:"A slow cooker. Six hours of nothing happening is the recipe working. Lifting the lid to check does not speed it up. It only lets the heat out.",
     rule:"If you cannot point to a written condition that has occurred, your action is no action. Close the chart and come back at the next scheduled check.",
-    example:"Swing call bought at $1.30, target $2.60, invalidation a close below $48.50. Day three: stock $50.90, contract $1.45. Target no. Invalidation no. Hold. Day four: stock $50.30, contract $1.20. Target no. Invalidation no. Hold. The trade is doing exactly what trades do."
+    example:"Your plan calls for taking profit at a $2.60 contract price and exiting on a daily close below $48.50 in the stock. The contract is at $1.20 and the stock closes at $50.30. Neither condition has occurred. No action. Check again at the next planned time."
   },
   {
     id:"observe", icon:"👁️", color:BL, title:"Observe, don't interfere",
-    short:"Watching the trade and touching the trade are two different jobs. Only one is yours.",
-    what:"Observing means checking price against the plan on the schedule your timeframe dictates. Interfering means changing the plan or the position because of what you saw during the check.",
-    why:"Each time you interfere, you replace a decision made calmly before entry with one made under pressure during it. Your calm self is the better trader. Let that version keep the wheel.",
+    short:"Watching the trade and touching the trade are two different jobs.",
+    what:"Observing means checking price against the plan on the schedule your timeframe dictates. Interfering means taking action that was not called for by the plan because of what you saw during the check.",
+    why:"Each time you interfere, you replace a decision made before entry with a new decision made while money and emotion are involved. The plan keeps the standard consistent.",
     analogy:"A lifeguard watches every swimmer and gets in the water only when someone is actually in trouble. Jumping in every time a swimmer ducks under would be exhausting and useless.",
-    rule:"Check the chart at fixed times that match the planned timeframe, for example the daily close for a swing trade. Between checks, the platform stays closed.",
-    example:"Your plan is built on daily candles. You check once after the close at 4 pm. Midday the stock drops $0.80 and you never see it, because you were not looking. By the close it has recovered. You held through a move that would have shaken you out at 1 pm."
+    rule:"Check the trade according to the timeframe and management schedule defined in your plan. Between planned checks, leave the trade alone.",
+    example:"Your plan is built on daily candles. You check once after the close at 4 pm. Midday the stock drops $0.80 and you never see it, because you were not looking. By the close it has recovered. You held through a move that might have shaken you out at 1 pm."
   },
   {
     id:"chart", icon:"🧠", color:BL, title:"Chart vs. emotion",
@@ -616,26 +616,26 @@ const STAY_CARDS = [
     what:"An emotional signal is an urge to act that cannot be traced to a written condition. A chart signal is a condition from the plan that has visibly occurred. They feel identical from the inside, which is the whole problem.",
     why:"Fear says exit a winner too early. Hope says hold a loser too long. Boredom says add to a position that does not need it. None of those are on your planner, and all of them feel urgent.",
     analogy:"Hunger versus a craving. Both feel like a need to eat. Only one of them is your body actually asking for food. The trick is pausing long enough to tell which one is talking.",
-    rule:"Before any action, name the condition from the planner that justifies it. If the sentence starts with 'I feel like' or 'I have a feeling,' you have found an emotion, not a signal. Do nothing.",
-    example:"Contract up from $1.30 to $1.75. You want to exit. Which condition occurred? Target is $2.60, no. Trail triggered? No. The sentence is 'I feel like it might come back down.' Emotion. Hold. The trade does not care how you feel about it."
+    rule:"Before any action, name the condition from the planner that justifies it. If you cannot point to a written condition that has occurred, you do not have a signal to act. Do nothing.",
+    example:"Contract up from $1.30 to $1.75. You want to exit. Which condition occurred? Target is $2.60, no. Trail triggered? No. The sentence is 'I feel like it might come back down.' Emotion. Hold."
   },
   {
     id:"maintain", icon:"📌", color:BL, title:"Maintain the plan",
-    short:"The plan is allowed to update in only one direction: tighter, never looser.",
-    what:"Maintaining the plan means keeping the written conditions unchanged during the trade, with one exception: moving a protective exit in the direction of the trade as structure develops, such as raising a stop under a new higher low.",
-    why:"Plans that loosen under pressure are not plans. Every widened stop and stretched target is the position rewriting the rules to protect itself, and it always sounds reasonable in the moment.",
-    analogy:"A budget. Moving money from dining out to savings mid‑month is maintenance. Raising the dining budget because you already overspent is the budget quietly ceasing to exist.",
-    rule:"Never move an invalidation level away from price. Never move a target further from price after entry. Tightening a protective exit behind a confirmed higher low is the only permitted change.",
-    example:"Invalidation was a close below $48.50. The stock rallies to $52 and forms a higher low at $50.60. Raising invalidation to a close below $50.60 is maintenance and protects gains. The stock then drifts to $50.80 and you consider dropping the level back to $48.50 'for room.' That is loosening. Not allowed."
+    short:"The plan can adapt only in ways you defined before entry.",
+    what:"Maintaining the plan means keeping the written conditions in force while the trade is live. If the plan includes rules for adjusting a target, trail, protective exit, or other management condition as the trade develops, follow those rules as written.",
+    why:"A plan that changes under pressure stops being a consistent decision framework. Predefined adjustments are management; improvised adjustments are new decisions.",
+    analogy:"A recipe that says “reduce heat after boiling.” Changing the heat because the recipe told you to is following the recipe. Changing the ingredients halfway through because you're nervous about dinner is improvising.",
+    rule:"Do not change a condition simply because you dislike what the trade is doing. Only make an adjustment the plan already allows, when its predefined trigger occurs.",
+    example:"Your plan says to raise invalidation beneath each confirmed higher low. A new higher low forms at $50.60, so you raise invalidation accordingly. Later price approaches $50.60 and you want to move it back to $48.50 “for room.” The first change followed the plan; the second rewrote it."
   },
   {
     id:"patience", icon:"⏳", color:BL, title:"Patience and discipline",
     short:"These are not personality traits. They are the result of having a plan you trust.",
     what:"Patience is the ability to sit in the hold state without acting. Discipline is executing the plan when a condition does occur, even when you would rather not. Both come from a written plan, not from willpower.",
-    why:"Willpower runs out, usually around the third red day. A plan does not. If staying with a trade feels like a constant fight, the fix is a clearer plan or a smaller size, not more grit.",
-    analogy:"Waiting for a kettle to boil. Nobody stands over it straining with willpower. You know how long it takes, so you do something else and come back when it whistles.",
-    rule:"Decide your check‑in schedule before entry and put it on the planner. Outside those check‑ins, the trade does not exist. If patience is failing, reduce size on the next trade rather than fighting this one.",
-    example:"Plan: swing trade, check daily after close. Day two you check at 10 am, noon, and 2 pm anyway. Each check produces an urge to do something. Note it in the journal: 'Checked off‑schedule three times, felt like exiting each time.' The fix on the next trade is the schedule, not the plan."
+    why:"Willpower runs out. A plan does not. If staying with a trade feels like a constant fight, that is useful information to review after the trade—not a reason to rewrite this one while it is live.",
+    analogy:"Waiting for a kettle to boil. You probably wouldn't stand over it straining with willpower. You know how long it takes, so you do something else and come back when it whistles.",
+    rule:"Decide before entry how and when the trade will be evaluated. Between those evaluations, let the plan work. If holding consistently feels difficult, record that observation and use it when reviewing the trade.",
+    example:"Plan: swing trade, check daily after close. Day two you check at 10 am, noon, and 2 pm anyway. Each check produces an urge to do something. Note it in the journal: 'Checked off‑schedule three times, felt like exiting each time.' Log the behavior. Nothing about those off‑schedule checks changed the conditions of this trade."
   },
 ];
 
@@ -652,8 +652,8 @@ function TabStay({goTab}){
 
       <div className="g3" style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:"10px",marginBottom:"18px"}}>
         {[
-          {n:"1",color:BL,title:"Check on schedule",desc:"Open the chart at the times your timeframe dictates. Daily close for a swing. Weekly for a LEAP."},
-          {n:"2",color:BL,title:"Compare to the plan",desc:"Target hit? Invalidation hit? Trail triggered? Structure broken? Answer each from the planner."},
+          {n:"1",color:BL,title:"Open the chart",desc:"Check the chart on the timeframe defined in your plan—not whenever you feel the urge to look."},
+          {n:"2",color:BL,title:"Compare to the plan",desc:"Profit‑management condition occurred? Invalidation condition occurred? Compare the chart with the conditions in your plan."},
           {n:"3",color:BL,title:"Close the platform",desc:"If every answer is no, the check is over. There is nothing to do until the next one."},
         ].map(s=>(
           <div key={s.n} style={{background:CA,border:"1px solid "+BD,borderRadius:"10px",padding:"14px",borderTop:"3px solid "+s.color}}>
@@ -664,7 +664,7 @@ function TabStay({goTab}){
         ))}
       </div>
 
-      <SectionLabel label="Holding well" sub="Five ideas that make the hold state easier to sit in. Tap to expand." color={BL}/>
+      <SectionLabel label="Holding well" sub="Five practices for managing a trade when no action is required. Tap to expand." color={BL}/>
       {STAY_CARDS.map(c=>(
         <ExpandableCard key={c.id} accent={c.color} icon={c.icon} title={c.title} shortDesc={c.short}
           isOpen={open===c.id} onToggle={()=>setOpen(open===c.id?null:c.id)}>
@@ -689,9 +689,9 @@ function TabStay({goTab}){
                 ["\"It's up, I should lock it in\"","Target not hit, trail not triggered","Hold. Journal the urge."],
                 ["\"It's down, I should get out\"","Above invalidation, thesis intact","Hold. Check again at the next scheduled close."],
                 ["\"It's flat, I should add\"","No condition in the plan says add","Hold. Adding is a new trade with a new plan."],
-                ["\"I should tighten my stop\"","A new higher low has formed","Raise the invalidation to below the higher low. This is allowed."],
-                ["\"I should give it more room\"","Price is near invalidation","Do not move it. Loosening is never allowed."],
-                ["\"Let me check a faster chart\"","Plan was built on the daily","Stay on the daily. The faster chart is noise for this trade."],
+                ["\"I should tighten my stop\"","A new higher low has formed","Check the plan. Adjust only if your management rule calls for it."],
+                ["\"I should give it more room\"","Price is near invalidation","Follow the condition already defined in the plan. Do not change it simply to avoid an exit."],
+                ["\"Let me check a faster chart\"","Plan was built on the daily","Stay on the planned timeframe. The faster chart is not part of this trade's decision framework."],
               ].map((r,i)=>(
                 <tr key={i} style={{borderBottom:"1px solid "+BD}}>
                   {r.map((c,j)=>(<td key={j} style={{padding:"10px 14px",fontSize:"0.76rem",color:j===0?DK:"#5a4535",fontStyle:j===0?"italic":"normal",lineHeight:"1.5"}}>{c}</td>))}
@@ -712,81 +712,68 @@ function TabStay({goTab}){
 // ═══════════════════════════════════════════════════════════════
 // TAB 5 — EXECUTE & EVALUATE
 // ═══════════════════════════════════════════════════════════════
-const JOURNAL_FIELDS = [
-  {k:"Ticker and contract",v:"Strike, expiration, direction"},
-  {k:"Thesis",v:"The chart reason you entered, in one sentence"},
-  {k:"Plan",v:"Entry premium, target or mechanism, invalidation level, timeframe"},
-  {k:"What price did",v:"Which condition occurred, and when"},
-  {k:"What you did",v:"Exit premium, and whether it matched the plan"},
-  {k:"Result",v:"Dollars and percent, per contract and total"},
-  {k:"Followed the plan?",v:"Yes or no. This is separate from the result."},
-  {k:"One line on how it felt",v:"Especially at the exit"},
-];
-
 function TabExecute({goTab}){
   return(
     <div className="fu">
       <QDA
         question="A condition from my plan has occurred. Now what?"
         options={["Execute","Hesitate"]}
-        action="Do the thing the plan says, on the candle that confirmed it. Then record what happened. Then, and only after a body of trades, look at the results and change one thing. This is the loop that turns trading into a process."
+        action="Do what the plan says when the predefined condition occurs. Then record what happened. Only after a body of trades, evaluate the results for a pattern and decide whether anything needs to change. This is the loop that turns trading into a process."
         color={OR}
       />
 
       <StepCard step="Step 1" title="Execute the plan" color={GR}>
-        When the profit‑management condition or the invalidation condition occurs, the decision is already made. Place the order. The only thing you are deciding at this moment is whether to be the kind of trader whose plans mean something.
-        <RuleBox color={GR} rule="Execute on the confirming candle of the planned timeframe. Use a market order to exit unless your plan specified a limit. Do not wait for 'one more candle.' The plan already told you which candle."/>
+        When the profit‑management condition or the invalidation condition occurs, the decision is already made. Place the order. Execution is simply carrying out the response you defined before the trade.
+        <RuleBox color={GR} rule="When the predefined condition occurs, execute the response written in your plan. Do not wait for additional confirmation or change the condition in the moment."/>
         <InfoBox icon="🧮" label="Example" bg="#e8faf3" green>
-          Target was a contract price of $2.60. The contract prints $2.62. You exit at $2.60 with a limit that fills immediately: $130 profit per contract. The stock runs another $2 the next day. You did not miss anything. That was not your trade, and the journal will show a plan executed cleanly.
+          Target was a contract price of $2.60. The contract reaches the target, and you exit as planned: $130 profit per contract. The stock runs another $2 the next day. You did not miss anything. That was not your trade, and the journal will show a plan executed cleanly.
         </InfoBox>
       </StepCard>
 
       <StepCard step="Step 2" title="Record the trade" color={PU}>
-        Log it the same day, before you look for the next setup. The record is the raw material for everything that follows. Until Dominique's Trade Journal is linked here, use these fields in whatever format you keep.
-        <div className="g2" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"6px",margin:"12px 0"}}>
-          {JOURNAL_FIELDS.map(f=>(
-            <div key={f.k} style={{background:"#f7f0e6",borderRadius:"8px",padding:"9px 12px",borderLeft:"3px solid "+PU}}>
-              <div style={{fontSize:"0.72rem",fontWeight:"700",color:DK,marginBottom:"2px"}}>{f.k}</div>
-              <div style={{fontSize:"0.72rem",color:"#5a4535",lineHeight:"1.45"}}>{f.v}</div>
-            </div>
-          ))}
-        </div>
-        <div style={{display:"flex",gap:"8px",flexWrap:"wrap"}}>
+        Log it the same day, before you look for the next setup. The record is the raw material for everything that follows.
+        <div style={{display:"flex",gap:"8px",flexWrap:"wrap",marginTop:"12px"}}>
           <LinkBtn label="📓 Open the Trade Journal" url={LINK.journal}/>
-          <LinkBtn label="📝 Open your Trade Planner" url={LINK.planner} color={OR}/>
         </div>
       </StepCard>
 
       <StepCard step="Step 3" title="Review execution, not just results" color={BL}>
-        Every trade lands in one of four boxes. Judge yourself on the column, not the row. A plan followed that lost money is a good trade. A plan broken that made money is the most dangerous kind, because it rewards the habit that will eventually cost you.
-        <div className="g2" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"8px",marginTop:"12px"}}>
-          {[
-            {t:"Followed plan · Won",bg:"#e8faf3",c:GR,tx:"#052e16",d:"The process worked. Nothing to change. Log it and move on."},
-            {t:"Followed plan · Lost",bg:"#e8faf3",c:GR,tx:"#052e16",d:"Also the process working. Losses are the cost of finding out. Log it and move on."},
-            {t:"Broke plan · Won",bg:"#fff0ee",c:RD,tx:"#5a1a1a",d:"A warning dressed as a reward. Write down exactly what you did instead of the plan, and why."},
-            {t:"Broke plan · Lost",bg:"#fff0ee",c:RD,tx:"#5a1a1a",d:"The most instructive box. What was the urge, and which condition did you tell yourself had occurred?"},
-          ].map(b=>(
-            <div key={b.t} style={{background:b.bg,borderRadius:"10px",padding:"12px 14px",borderTop:"3px solid "+b.c}}>
-              <div style={{fontSize:"0.72rem",fontWeight:"700",color:b.c,marginBottom:"4px"}}>{b.t}</div>
-              <div style={{fontSize:"0.75rem",color:b.tx,lineHeight:"1.55"}}>{b.d}</div>
-            </div>
-          ))}
+        Every trade lands in one of four boxes. Evaluate the financial outcome and the execution separately. A losing trade can still reflect planned execution, while a profitable trade can result from execution outside the plan.
+        <div style={{overflowX:"auto",marginTop:"12px"}}>
+          <table style={{width:"100%",borderCollapse:"collapse",minWidth:"420px"}}>
+            <thead><tr style={{background:"#faf6ef"}}>
+              {["","Followed the plan","Did not follow the plan"].map((h,i)=>(
+                <th key={i} style={{textAlign:"left",padding:"9px 12px",fontSize:"0.62rem",fontWeight:"700",letterSpacing:"0.1em",textTransform:"uppercase",color:"#8a7560",border:"1px solid "+BD}}>{h}</th>
+              ))}
+            </tr></thead>
+            <tbody>
+              {[
+                ["Profitable trade","Planned execution + profitable outcome","Unplanned execution + profitable outcome"],
+                ["Losing trade","Planned execution + losing outcome","Unplanned execution + losing outcome"],
+              ].map((r,i)=>(
+                <tr key={i}>
+                  {r.map((c,j)=>(<td key={j} style={{padding:"9px 12px",fontSize:"0.76rem",color:j===0?DK:"#5a4535",fontWeight:j===0?"700":"400",lineHeight:"1.5",border:"1px solid "+BD,background:j===0?"#faf6ef":(j===1?"#e8faf3":"#fff0ee")}}>{c}</td>))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
+        <div style={{marginTop:"10px"}}>The financial result tells you what happened to the trade. The execution result tells you whether you managed it according to plan. Keep those two evaluations separate.</div>
       </StepCard>
 
       <StepCard step="Step 4" title="Evaluate the sample" color={GD}>
-        One trade tells you almost nothing. A set of trades managed the same way tells you a lot. Before you change any rule, sit down with the journal and look across the whole body of results for patterns that repeat.
-        <RuleBox color={GD} rule="Review only after a full sample of trades executed with the same rules. Twenty trades is a reasonable minimum for most styles. Ask: which rule failed repeatedly, and did I follow the plan on the trades that lost?"/>
+        One trade tells you almost nothing. A set of trades managed the same way gives you something to evaluate. Before you change any rule, sit down with the journal and look across the whole body of results for patterns that repeat.
+        <RuleBox color={GD} rule="Review a sample of comparable trades executed under the same rules. Look for patterns that repeat across the sample, and separate the performance of the plan from how consistently you followed it."/>
         <InfoBox icon="🔍" label="What to look for" bg="#f7f0e6">
-          Losers that were exited late, more than a few times. Winners cut well short of the target, more than a few times. Invalidation levels that were routinely hit and then reversed. A high count in the "broke plan" column. Any of these is a pattern. A single instance of any of them is a Tuesday.
+          Losers that were exited late, repeatedly. Winners cut well short of the target, repeatedly. Invalidation levels that were routinely hit and then reversed. A recurring pattern of execution outside the plan. These are the things to investigate across the sample. A single instance of any of them is a Tuesday.
         </InfoBox>
       </StepCard>
 
       <StepCard step="Step 5" title="Change one variable" color={OR}>
-        Once the sample shows a real pattern, adjust exactly one rule in the plan and run the next sample with the change in place. Change two things and you will never know which one worked.
-        <RuleBox color={OR} rule="Change one rule per sample. Write the change and the reason on the planner before the next trade. Run the full sample again before judging it."/>
+        Once the sample reveals a repeatable pattern, identify one variable to test in the next sample. Keeping the rest of the plan consistent makes it easier to evaluate the effect of that change.
+        <RuleBox color={OR} rule="Test one change at a time when practical. Write the change and the reason on the planner before the next trade, then evaluate it across another sample of comparable trades."/>
         <InfoBox icon="🧮" label="Example" bg="#e8faf3" green>
-          Across twenty swing trades, your trailing stop triggered on ordinary pullbacks eight times, and price went on to hit the target in six of those. The pattern is a trail that is too tight for the daily timeframe. Change: trail below the prior two days' low instead of one. Nothing else changes. Twenty more trades, then evaluate again.
+          Across a sample of swing trades, your trailing stop repeatedly triggered on ordinary pullbacks, and price often went on to hit the target. That suggests the trail may be too tight for the daily timeframe. Test one change: trail below the prior two days' low instead of one. Keep the rest of the plan consistent, then evaluate the change across another comparable sample.
         </InfoBox>
       </StepCard>
 
@@ -794,9 +781,9 @@ function TabExecute({goTab}){
         color={OR}
         question="Am I changing this rule because of a pattern in the journal, or because of the trade that just closed?"
         noLabel="Trade"
-        no="Do not change it. Log the trade, note the urge, and keep executing the current plan until the sample is complete."
+        no="Do not change it based on one trade. Log the trade, note the urge, and continue collecting comparable trades under the current plan."
         yesLabel="Pattern"
-        yes="Change that one rule, write the reason down, and carry it into your next Module 5 plan."
+        yes="Define one change to test, write down the reason, and carry it into your next Module 5 plan."
       />
 
       <PathSwitch current={4} goTab={goTab}/>
